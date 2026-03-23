@@ -21,10 +21,11 @@ AGENTS.md
 !mydev/wp-content/themes/tharchive-theme/
 !mydev/wp-content/themes/tharchive-theme/**
 
+#all node_modules directories
+**/node_modules/
+**/node_modules/**
 # Ignore local dependencies and caches inside kept directories.
 mydev/wp-content/plugins/tharchive-core/node_modules/
 mydev/wp-content/plugins/tharchive-core/node_modules/**
 mydev/wp-content/plugins/tharchive-core/.vite/
 mydev/wp-content/plugins/tharchive-core/.vite/**
-mydev/wp-content/plugins/tharchive-core/dist/
-mydev/wp-content/plugins/tharchive-core/dist/**
