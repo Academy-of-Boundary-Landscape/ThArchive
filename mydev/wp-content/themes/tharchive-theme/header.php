@@ -50,10 +50,10 @@ $site_title     = '东方同人接力归档';
 
 			<nav class="tharchive-site-nav" aria-label="<?php esc_attr_e( 'Primary', 'tharchive-theme' ); ?>">
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( '首页', 'tharchive-theme' ); ?></a>
-				<a href="<?php echo esc_url( $relay_list_url ); ?>"><?php esc_html_e( '接力列表', 'tharchive-theme' ); ?></a>
+				<a href="<?php echo esc_url( $relay_list_url ); ?>"><?php esc_html_e( '往期接力列表大全', 'tharchive-theme' ); ?></a>
+				<a href="<?php echo esc_url( $submit_url ); ?>"><?php esc_html_e( '投稿接力活动', 'tharchive-theme' ); ?></a>
 				<a href="<?php echo esc_url( $recent_relay_url ); ?>"><?php esc_html_e( '近期接力', 'tharchive-theme' ); ?></a>
-				<a href="<?php echo esc_url( $submit_url ); ?>"><?php esc_html_e( '提交接力信息', 'tharchive-theme' ); ?></a>
-				<a href="<?php echo esc_url( $about_url ); ?>"><?php esc_html_e( '关于', 'tharchive-theme' ); ?></a>
+				<a href="<?php echo esc_url( $about_url ); ?>"><?php esc_html_e( '关于和更新日志', 'tharchive-theme' ); ?></a>
 			</nav>
 
 			<div class="tharchive-header-status" aria-hidden="true">

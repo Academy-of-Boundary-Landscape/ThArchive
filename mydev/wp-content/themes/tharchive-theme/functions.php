@@ -130,7 +130,7 @@ function tharchive_theme_get_submit_url() {
  * @return string
  */
 function tharchive_theme_get_relay_list_url() {
-	$candidates = array( 'relay-list', 'relay_event', 'relay-events' );
+	$candidates = array( 'event-list', 'relay-list', 'relay_event', 'relay-events' );
 
 	foreach ( $candidates as $slug ) {
 		$page = get_page_by_path( $slug );
@@ -144,7 +144,7 @@ function tharchive_theme_get_relay_list_url() {
 		return $archive_link;
 	}
 
-	return home_url( '/relay-list/' );
+	return home_url( '/event-list/' );
 }
 
 /**
