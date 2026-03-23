@@ -1,0 +1,37 @@
+:root {
+  --th-archive-surface: transparent;
+  --th-archive-surface-strong: transparent;
+  --th-archive-border: rgba(154, 186, 232, 0.28);
+  --th-archive-border-strong: rgba(188, 226, 255, 0.72);
+  --th-archive-dashed: rgba(156, 192, 236, 0.24);
+  --th-archive-text: #e2e8f0;
+  --th-archive-text-soft: #a0aec0;
+  --th-archive-button-bg: linear-gradient(180deg, rgba(10, 18, 30, 0.62) 0%, rgba(8, 14, 24, 0.44) 100%);
+  --th-archive-button-bg-hover: linear-gradient(180deg, rgba(18, 32, 50, 0.72) 0%, rgba(10, 18, 32, 0.54) 100%);
+  --th-archive-button-shadow: 0 12px 28px rgba(4, 10, 18, 0.24), inset 0 0 0 1px rgba(220, 240, 255, 0.04);
+  --th-archive-button-shadow-hover: 0 14px 34px rgba(4, 10, 18, 0.32), 0 0 16px rgba(140, 230, 255, 0.08), inset 0 0 0 1px rgba(220, 240, 255, 0.08);
+
+  /* 面板角线配置：统一维护可在组件上覆写 */
+  --th-frame-corner-size: 14px;
+  --th-frame-corner-stroke: 2px;
+  --th-frame-corner-offset: -1px;
+}
+
+.tharchive-archive-page .carousel-block__state,
+.tharchive-archive-page .event-carousel__stage,
+.tharchive-archive-page .event-carousel__caption-box,
+.tharchive-archive-page .event-carousel__thumb {
+  border: 1px solid var(--th-archive-border) !important;
+  outline: 1px dashed var(--th-archive-dashed);
+  outline-offset: -5px;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.tharchive-archive-page .scifi-calendar-panel {
+  border: 1px solid var(--th-archive-border) !important;
+  outline: 1px dashed var(--th-archive-dashed);
+  outline-offset: -5px;
+  border-radius: 0 !important;
+  background: transparent !important;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "tharchive-core-submission-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && npm run build:submission && npm run build:archive && npm run build:carousel",
+    "build:submission": "vite build --mode submission-app",
+    "build:archive": "vite build --mode archive-app",
+    "build:carousel": "vite build --mode carousel-app",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "naive-ui": "^2.44.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19",
+    "vue-tsc": "^2.2.0"
+  }
+}

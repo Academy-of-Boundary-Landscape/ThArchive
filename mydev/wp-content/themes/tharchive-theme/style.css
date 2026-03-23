@@ -1,0 +1,640 @@
+/*
+Theme Name: THArchive Theme
+Theme URI: https://yuriko.cn/
+Author: renko_1055
+Author URI: https://abl.secret-sealing.club/
+Description: 东方Project 同人接力归档网站主题。V1.0 Astrolabe
+Version: 1.0.0
+Last Updated: 2026.3.24
+Requires at least: 6.0
+Tested up to: 6.8
+Requires PHP: 7.4
+Text Domain: tharchive-theme
+*/
+
+/*
+ * Global reusable stylesheet.
+ * Page-specific styles live in assets/css/*.css
+ */
+/*
+Theme Name: THArchive Theme
+...
+*/
+
+:root {
+  /* 极致深邃的星空底色 - 纯黑 */
+  --bg: #000000;
+  --bg-soft: #0a0d17;
+  --bg-panel: transparent;
+  --bg-panel-strong: transparent;
+  --panel-blur: 0px;
+
+  /* 文字颜色：星光白与星云灰 */
+  --text: #eef4ff;
+  --text-soft: #a8b8d9;
+  --text-dim: #7384ab;
+
+  /* 边框与线条：星轨轨迹 */
+  --line: rgba(140, 180, 255, 0.15);
+  --line-strong: rgba(140, 180, 255, 0.4);
+
+  /* 主题色：天狼星蓝、参宿紫、星芒青 */
+  --accent: #6b9fff;
+  --accent-2: #8ce6ff;
+  --accent-3: #b08cff;
+
+  /* 阴影与发光 */
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --glow-subtle: 0 0 20px rgba(107, 159, 255, 0.15);
+  --glow-strong: 0 0 30px rgba(140, 230, 255, 0.4);
+
+  /* 统一的斜切角维度 (代替 border-radius) */
+  --angle-sm: 8px;
+  --angle-md: 16px;
+  --angle-lg: 24px;
+
+  --content-width: 1120px;
+  --reading-width: 820px;
+
+  --font-sans: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-display: "Orbitron", "Cinzel", "Rajdhani", var(--font-sans);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.75;
+  background-color: var(--bg);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 优化后的全局滤镜层（移除了高开销的 SVG 噪点与高耗能混合模式） */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+  background: 
+    radial-gradient(circle at center, transparent 30%, rgba(2, 4, 10, 0.15) 60%, rgba(0, 0, 0, 0.5) 100%),
+    radial-gradient(circle at 15% 25%, rgba(65, 88, 208, 0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 85% 75%, rgba(200, 80, 192, 0.15) 0%, transparent 50%);
+  /* mix-blend-mode 叠加在全屏滚动时非常消耗 GPU 渲染，此处用普通透明叠加来平替 */
+}
+
+/* =========================================
+   1. 天文学动态星空背景 (Astronomy Background)
+   ========================================= */
+.astronomy-background {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 120%, rgba(30, 80, 160, 0.45) 0%, transparent 60%);
+}
+
+/* 利用 box-shadow 绘制星空 */
+.stars-layer-1, .stars-layer-2 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.stars-layer-1 {
+  background: transparent;
+  /* 调整密度和亮度 */
+  background-image: radial-gradient(1.5px 1.5px at 10% 10%, #fff, transparent),
+                    radial-gradient(2px 2px at 25% 40%, rgba(255,255,255,1), transparent),
+                    radial-gradient(1.5px 1.5px at 45% 80%, #fff, transparent),
+                    radial-gradient(2.5px 2.5px at 70% 20%, rgba(140,230,255,1), transparent),
+                    radial-gradient(1.5px 1.5px at 85% 60%, #fff, transparent),
+                    radial-gradient(2px 2px at 58% 28%, rgba(255,255,255,1), transparent),
+                    radial-gradient(1.8px 1.8px at 78% 78%, rgba(140,230,255,0.9), transparent),
+                    radial-gradient(1.5px 1.5px at 92% 42%, rgba(255,255,255,0.9), transparent);
+  background-size: 250px 250px;
+  animation: twinkle 4.5s infinite alternate ease-in-out;
+}
+.stars-layer-2 {
+  background-image: radial-gradient(2px 2px at 15% 85%, rgba(176,140,255,1), transparent),
+                    radial-gradient(2.5px 2.5px at 35% 15%, #fff, transparent),
+                    radial-gradient(1.5px 1.5px at 60% 50%, #fff, transparent),
+                    radial-gradient(2px 2px at 90% 10%, rgba(140,230,255,0.9), transparent),
+                    radial-gradient(1.8px 1.8px at 48% 66%, rgba(255,255,255,0.9), transparent),
+                    radial-gradient(2px 2px at 72% 36%, rgba(176,140,255,0.9), transparent);
+  background-size: 350px 350px;
+  animation: twinkle 6.5s infinite alternate-reverse ease-in-out;
+}
+
+/* 流星雨系统 */
+.meteor-shower {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* 确保不遮挡底部内容和按钮 */
+  z-index: 1; /* 置于底层 */
+}
+.meteor {
+  position: absolute;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(140,230,255,0.4) 60%, rgba(255,255,255,1) 100%);
+  opacity: 0;
+  filter: drop-shadow(0 0 4px #8ce6ff);
+  transform: rotate(135deg);
+  border-radius: 999px 0 0 999px;
+}
+.meteor::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px 2px rgba(140, 230, 255, 1), 0 0 20px 4px rgba(255, 255, 255, 0.8);
+}
+.meteor:nth-child(1) { top: 8%; left: 90%; animation: falling-star 7s infinite ease-out; animation-delay: 0.8s; }
+.meteor:nth-child(2) { top: 18%; left: 78%; animation: falling-star 8.5s infinite ease-out; animation-delay: 2.2s; }
+.meteor:nth-child(3) { top: 30%; left: 96%; animation: falling-star 6s infinite ease-out; animation-delay: 3.6s; width: 140px; }
+.meteor:nth-child(4) { top: -10%; left: 60%; animation: falling-star 9s infinite ease-out; animation-delay: 1.7s; width: 120px; }
+.meteor:nth-child(5) { top: 5%; left: 40%; animation: falling-star 7.5s infinite ease-out; animation-delay: 4.4s; }
+.meteor:nth-child(6) { top: 70%; left: 82%; animation: falling-star 10s infinite ease-out; animation-delay: 5.8s; width: 160px; }
+.meteor:nth-child(7) { top: -20%; left: 20%; animation: falling-star 8.2s infinite ease-out; animation-delay: 1.2s; width: 130px; }
+.meteor:nth-child(8) { top: 15%; left: 10%; animation: falling-star 6.8s infinite ease-out; animation-delay: 5.1s; }
+.meteor:nth-child(9) { top: -5%; left: 110%; animation: falling-star 9.5s infinite ease-out; animation-delay: 0.3s; width: 150px; }
+.meteor:nth-child(10) { top: 40%; left: 30%; animation: falling-star 11s infinite ease-out; animation-delay: 3.8s; }
+.meteor:nth-child(11) { top: -15%; left: 85%; animation: falling-star 7.8s infinite ease-out; animation-delay: 6.5s; width: 110px; }
+.meteor:nth-child(12) { top: 25%; left: -5%; animation: falling-star 8.8s infinite ease-out; animation-delay: 2.9s; width: 145px; }
+
+@keyframes twinkle {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes falling-star {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(135deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  35% {
+    transform: translate3d(-100vmax, 100vmax, 0) rotate(135deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(-100vmax, 100vmax, 0) rotate(135deg);
+    opacity: 0;
+  }
+}
+
+/* =========================================
+   2. 排版与基础元素
+   ========================================= */
+a {
+  color: var(--accent-2);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+a:hover {
+  color: #fff;
+  text-shadow: 0 0 8px var(--accent-2);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* =========================================
+   3. 核心组件：统一棱角系统 (Angular UI)
+   ========================================= */
+/* 使用 Clip-path 替代 border-radius */
+.tharchive-panel,
+.tharchive-card,
+.tharchive-empty-state {
+  position: relative;
+  background: var(--bg-panel);
+  padding: 32px;
+  backdrop-filter: blur(var(--panel-blur));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  /* 八边形切角切割 */
+  clip-path: polygon(
+    var(--angle-md) 0, 
+    100% 0, 
+    100% calc(100% - var(--angle-md)), 
+    calc(100% - var(--angle-md)) 100%, 
+    0 100%, 
+    0 var(--angle-md)
+  );
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 绘制棱角边框 (因为 clip-path 会裁掉 border) */
+.tharchive-panel::before,
+.tharchive-card::before,
+.tharchive-empty-state::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px; /* 边框厚度 */
+  background: linear-gradient(135deg, var(--accent-2), transparent 40%, transparent 60%, var(--accent-3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.tharchive-card:hover {
+  transform: translateY(-4px);
+  background: var(--bg-panel-strong);
+}
+.tharchive-card:hover::before {
+  opacity: 1;
+}
+
+/* Shortcode 轮播需要允许图片光晕超出面板边界，避免被 clip-path 裁掉。 */
+.tharchive-panel--carousel-host,
+.tharchive-panel:has(.tharchive-carousel-embed),
+.tharchive-panel:has(.tharchive-carousel-app) {
+  clip-path: none;
+}
+
+.tharchive-panel--carousel-host::before,
+.tharchive-panel:has(.tharchive-carousel-embed)::before,
+.tharchive-panel:has(.tharchive-carousel-app)::before {
+  display: none;
+}
+
+/* =========================================
+   4. 按钮系统 (星光划过效果)
+   ========================================= */
+.button, button, input[type="submit"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.8rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: rgba(140, 230, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  /* 对角斜切 */
+  clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 按钮静态边框 (伪元素) */
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--line-strong);
+  clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
+  transition: border-color 0.3s ease;
+}
+
+/* 按钮悬停时的星光扫过特效 */
+.button::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(140, 230, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+
+.button:hover {
+  background: rgba(140, 230, 255, 0.15);
+  box-shadow: var(--glow-strong);
+  text-shadow: 0 0 8px #fff;
+}
+.button:hover::before {
+  border-color: var(--accent-2);
+}
+.button:hover::after {
+  animation: starlight-sweep 0.6s ease-out forwards;
+}
+
+@keyframes starlight-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* =========================================
+   5. 导航与布局 (Navigation & Layout)
+   ========================================= */
+.tharchive-site-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tharchive-site-main,
+.container,
+.reading-container,
+.tharchive-site-header,
+.tharchive-site-footer {
+  width: min(var(--content-width), calc(100% - 48px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tharchive-site-main {
+  flex: 1;
+  padding: 26px 0 40px;
+}
+
+.tharchive-site-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(2, 4, 10, 0.46);
+  border-bottom: 1px solid var(--line);
+}
+
+.tharchive-site-header {
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0;
+}
+
+.tharchive-header-left {
+  min-width: 0;
+}
+
+.tharchive-brand {
+  display: grid;
+  gap: 0;
+  color: inherit;
+  line-height: 1.1;
+}
+
+.tharchive-brand:hover {
+  text-shadow: none;
+}
+
+.tharchive-brand__kicker {
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.tharchive-brand__title {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  letter-spacing: 0.06em;
+  color: #f8fbff;
+}
+
+.tharchive-site-nav {
+  justify-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 顶部菜单也加入斜切角 */
+.tharchive-site-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 11px;
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  background: rgba(16, 22, 38, 0.26);
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  border: 1px solid rgba(140, 180, 255, 0.18);
+}
+.tharchive-site-nav a:hover {
+  color: #ffffff;
+  background: rgba(107, 159, 255, 0.2);
+  border-color: rgba(140, 230, 255, 0.55);
+}
+
+.tharchive-header-status {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  min-height: 28px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  border: 1px solid rgba(140, 180, 255, 0.22);
+  background: rgba(10, 16, 30, 0.25);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.tharchive-header-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #8ce6ff;
+  box-shadow: 0 0 10px rgba(140, 230, 255, 0.9);
+}
+
+.tharchive-site-footer-wrap {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  background: rgba(2, 4, 10, 0.36);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.tharchive-site-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 0 18px;
+}
+
+.tharchive-footer-block {
+  min-width: 0;
+}
+
+.tharchive-footer-title {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  color: #f5f9ff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tharchive-footer-desc,
+.tharchive-footer-meta p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.tharchive-footer-link {
+  color: var(--accent-2);
+  word-break: break-word;
+}
+
+.tharchive-footer-link:hover {
+  color: #ffffff;
+}
+
+.tharchive-footer-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.tharchive-footer-nav {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.tharchive-footer-nav a {
+  color: var(--text-soft);
+  font-size: 0.86rem;
+}
+
+.tharchive-footer-nav a:hover {
+  color: #ffffff;
+}
+
+.tharchive-footer-copyright {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(140, 180, 255, 0.2);
+  color: var(--text-dim);
+  font-size: 0.76rem;
+}
+
+/* 其他表单元素同样应用斜切美学 */
+input[type="text"], textarea {
+  clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
+  background: rgba(10, 15, 28, 0.6);
+  border: 1px solid var(--line);
+  color: #fff;
+}
+input:focus, textarea:focus {
+  background: rgba(10, 15, 28, 0.9);
+  outline: none;
+  /* 模拟内部发光边框 */
+  box-shadow: inset 0 0 0 1px var(--accent-2), 0 0 15px rgba(140, 230, 255, 0.2);
+}
+
+@media (max-width: 980px) {
+  .tharchive-site-header {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 8px;
+    padding: 10px 0;
+  }
+
+  .tharchive-site-nav {
+    justify-self: start;
+  }
+
+  .tharchive-header-status {
+    justify-self: start;
+  }
+
+  .tharchive-site-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tharchive-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .tharchive-site-main,
+  .container,
+  .reading-container,
+  .tharchive-site-header,
+  .tharchive-site-footer {
+    width: min(var(--content-width), calc(100% - 20px));
+  }
+
+  .tharchive-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tharchive-panel,
+  .tharchive-empty-state,
+  .tharchive-card {
+    padding: 18px;
+  }
+
+  .tharchive-site-nav {
+    gap: 8px;
+  }
+
+  .tharchive-site-nav a {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 0.92rem;
+  }
+
+  .tharchive-header-status {
+    min-height: 26px;
+    font-size: 0.62rem;
+  }
+
+  .tharchive-site-footer {
+    grid-template-columns: 1fr;
+    padding: 18px 0 16px;
+  }
+
+  .button,
+  .wp-block-button__link,
+  button,
+  input[type="submit"],
+  input[type="button"],
+  input[type="reset"] {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tharchive-site-footer {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,22 @@
+# Ignore everything by default.
+*
+.*
+
+# Keep repository-level docs.
+!.gitignore
+!README.md
+!docs/
+!docs/**
+
+# Ignore local agent instructions.
+AGENTS.md
+
+# Keep the two deliverable WordPress code directories.
+!mydev/
+!mydev/wp-content/
+!mydev/wp-content/plugins/
+!mydev/wp-content/plugins/tharchive-core/
+!mydev/wp-content/plugins/tharchive-core/**
+!mydev/wp-content/themes/
+!mydev/wp-content/themes/tharchive-theme/
+!mydev/wp-content/themes/tharchive-theme/**

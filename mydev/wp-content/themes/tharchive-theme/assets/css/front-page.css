@@ -1,0 +1,173 @@
+.front-page-main {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  /* 移除了 overflow: hidden 以允许星图延伸至全屏并覆盖 footer */
+}
+
+/* 星盘穹顶网格及鼠标探照灯效果 */
+.front-page-main::before {
+  content: "";
+  position: fixed; /* 变为视口固定，填充满整个屏幕 */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  
+  /* 
+     弧形星盘效果：圆心在屏幕正下方，制造巨大圆弧的深度感
+     1. 同心大圆弧（间距缩小，变密）
+     2. 发射状经线（透明度降低、线宽变极细避免变粗光束，且间距变小）
+  */
+  background-image: 
+    repeating-radial-gradient(circle at 50% 150%, transparent 0, transparent 49px, rgba(140, 180, 255, 0.25) 50px),
+    repeating-conic-gradient(from 0deg at 50% 150%, rgba(140, 180, 255, 0.08) 0deg, transparent 0.1deg, transparent 2.5deg);
+  background-position: center bottom;
+
+  /* 
+     鼠标光晕遮罩：配合 fixed 布局。
+     使用 -999px 使得常态下（鼠标未移动获取坐标时）探照灯位于屏幕外，实现完全隐藏。
+     进一步收缩半径到 180px 并加强透明度衰减，只照亮鼠标焦点周边非常小的一块。
+  */
+  -webkit-mask-image: radial-gradient(circle 180px at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+  mask-image: radial-gradient(circle 180px at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+}
+
+.front-hero {
+  position: relative;
+  z-index: 10; /* 确保内容在滤镜层的影响下依然清晰 */
+  padding: 0;
+  width: 100%;
+}
+
+.front-hero__content {
+  width: min(920px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0;
+  position: relative;
+  text-align: center;
+  /* 
+     虽然你想要背景透明，但建议给文字层加一个极其微弱的径向背景，
+     像一层淡淡的雾，能显著提升文字的可读性。
+  */
+  background: radial-gradient(circle at center, rgba(10, 15, 28, 0.4) 0%, transparent 80%);
+}
+
+.front-hero__eyebrow {
+  margin: 0 0 16px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.4em; /* 增加字间距，更有天文仪器的冷峻感 */
+  text-transform: uppercase;
+  color: var(--accent-2);
+  text-shadow: 0 0 15px rgba(140, 230, 255, 0.6);
+  opacity: 0.9;
+}
+
+.front-hero__title {
+  margin: 0 0 28px;
+  font-size: clamp(2.2rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  /* 这里的渐变色微调为带一点“星光冷色” */
+  background: linear-gradient(135deg, #fff 30%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* 增强发光效果 */
+  filter: drop-shadow(0 0 20px rgba(124, 226, 255, 0.3));
+}
+
+.front-hero__desc {
+  margin: 0 auto;
+  max-width: 680px;
+  font-size: 1.15rem;
+  color: var(--text-soft);
+  line-height: 1.9;
+  font-weight: 300;
+  /* 防止文字太散，可以加一点点暗影 */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.front-hero__actions {
+  margin-top: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.front-hero__carousel {
+  margin-top: 64px;
+  width: min(1100px, calc(100vw - 40px));
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  padding: 22px 20px 10px;
+  background: radial-gradient(circle at center, rgba(10, 15, 28, 0.32) 0%, rgba(10, 15, 28, 0.12) 52%, transparent 82%);
+}
+
+.front-hero__carousel .tharchive-carousel-embed {
+  display: block;
+  width: 100%;
+  max-width: 960px;
+  flex: 0 1 960px;
+  margin: 0 auto;
+}
+
+.front-hero__carousel .tharchive-carousel-app {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+.front-hero__carousel .tharchive-carousel-app__header h3 {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  text-shadow: 0 0 14px rgba(140, 230, 255, 0.24);
+}
+
+/* 主页特供：带有“棱角”和“扫描线”动画的按钮 */
+.front-button {
+  min-width: 200px;
+  /* 即使主页没有框，按钮也应该保持棱角风格 */
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  backdrop-filter: blur(8px);
+}
+
+/* 媒体查询优化 */
+@media (max-width: 720px) {
+  .front-hero__content {
+    padding: 20px 0;
+  }
+  .front-hero__title {
+    font-size: 2.5rem;
+  }
+  .front-hero__actions {
+    flex-direction: column;
+    padding: 0 20px;
+  }
+
+  .front-hero__carousel {
+    margin-top: 44px;
+    width: min(1100px, calc(100vw - 20px));
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 16px 0 0;
+  }
+
+  .front-button {
+    width: 100%;
+  }
+}

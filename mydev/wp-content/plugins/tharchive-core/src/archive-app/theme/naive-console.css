@@ -1,0 +1,104 @@
+.tharchive-archive-page .n-card,
+.tharchive-archive-page .n-base-selection,
+.tharchive-archive-page .n-input,
+.tharchive-archive-page .n-button,
+.tharchive-archive-page .n-radio-button,
+.tharchive-archive-page .n-pagination-item,
+.tharchive-archive-page .n-pagination-jump,
+.tharchive-archive-page .n-empty,
+.tharchive-archive-page .n-base-tag {
+  border-radius: 0 !important;
+}
+
+.tharchive-archive-page .n-card,
+.tharchive-archive-page .n-base-selection,
+.tharchive-archive-page .n-input,
+.tharchive-archive-page .n-button,
+.tharchive-archive-page .n-radio-button {
+  background: transparent !important;
+  border-color: var(--th-archive-border) !important;
+}
+
+.tharchive-archive-page .n-button,
+.tharchive-archive-page .n-radio-button,
+.tharchive-archive-page .n-pagination-item,
+.tharchive-archive-page .n-pagination-jump {
+  outline: none;
+}
+
+.tharchive-archive-page .n-radio-button.n-radio-button--checked,
+.tharchive-archive-page .n-radio-button.n-radio-button--checked:hover {
+  color: #fff !important;
+  border-color: var(--th-archive-border-strong) !important;
+  background: linear-gradient(180deg, rgba(28, 48, 72, 0.72) 0%, rgba(12, 22, 36, 0.54) 100%) !important;
+  box-shadow: 0 8px 18px rgba(4, 10, 18, 0.24), 0 0 0 1px rgba(188, 226, 255, 0.16);
+}
+
+.tharchive-archive-page .n-base-selection:hover,
+.tharchive-archive-page .n-input:hover,
+.tharchive-archive-page .n-button:hover {
+  border-color: var(--th-archive-border-strong) !important;
+}
+
+.tharchive-archive-page .n-button {
+  box-shadow: var(--th-archive-button-shadow);
+}
+
+.tharchive-archive-page .n-pagination .n-pagination-item,
+.tharchive-archive-page .n-pagination .n-pagination-jump,
+.tharchive-archive-page .n-pagination .n-pagination-item-ellipsis {
+  min-width: 40px;
+  height: 40px;
+  border: 1px solid var(--th-archive-border) !important;
+  background: var(--th-archive-button-bg) !important;
+  color: var(--th-archive-text) !important;
+  box-shadow: var(--th-archive-button-shadow);
+}
+
+.tharchive-archive-page .n-pagination .n-pagination-item:hover,
+.tharchive-archive-page .n-pagination .n-pagination-jump:hover {
+  border-color: var(--th-archive-border-strong) !important;
+  background: var(--th-archive-button-bg-hover) !important;
+  box-shadow: var(--th-archive-button-shadow-hover);
+}
+
+.tharchive-archive-page .n-pagination .n-pagination-item--active {
+  border-color: rgba(188, 226, 255, 0.82) !important;
+  background: linear-gradient(180deg, rgba(32, 56, 84, 0.76) 0%, rgba(14, 28, 44, 0.62) 100%) !important;
+  color: #ffffff !important;
+}
+
+.tharchive-archive-page .console-switch .n-radio-group {
+  gap: 0.4rem;
+}
+
+.tharchive-archive-page .n-empty {
+  border: 1px dashed var(--th-archive-dashed);
+  padding: 1rem;
+}
+
+.tharchive-archive-page .n-base-tag {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px dashed var(--th-archive-border-strong) !important;
+}
+
+.tharchive-archive-page .n-modal-mask {
+  background-color: rgba(2, 6, 12, 0.66) !important;
+}
+
+.tharchive-archive-page .cyber-modal .n-card {
+  width: min(800px, 90vw);
+  max-width: 90vw;
+  background: rgba(10, 14, 22, 0.88) !important;
+  border: 1px solid var(--th-archive-border-strong) !important;
+  outline: 1px dashed var(--th-archive-dashed);
+  outline-offset: -8px;
+}
+
+.tharchive-archive-page .console-switch .n-radio-button {
+  min-width: 108px;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--th-archive-border) !important;
+  background: var(--th-archive-button-bg) !important;
+  box-shadow: var(--th-archive-button-shadow);
+}

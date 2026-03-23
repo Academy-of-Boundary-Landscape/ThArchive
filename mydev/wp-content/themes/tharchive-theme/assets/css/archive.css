@@ -1,0 +1,30 @@
+/* Archive/index specific layout tweaks. Shared component styles stay in style.css */
+
+.post-type-archive-relay_event .tharchive-panel > p:first-of-type,
+.blog .tharchive-panel > p:first-of-type,
+.home .tharchive-panel > p:first-of-type {
+  max-width: 70ch;
+  color: var(--text-soft);
+}
+
+.post-type-archive-relay_event .tharchive-card,
+.blog .tharchive-card,
+.home .tharchive-card {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.post-type-archive-relay_event .tharchive-card img,
+.blog .tharchive-card img,
+.home .tharchive-card img {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+
+.post-type-archive-relay_event .tharchive-card a,
+.blog .tharchive-card a,
+.home .tharchive-card a {
+  word-break: break-word;
+}
