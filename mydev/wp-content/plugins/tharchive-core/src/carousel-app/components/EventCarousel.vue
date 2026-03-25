@@ -18,8 +18,8 @@
             class="event-carousel__slide"
             :class="slideClass(index)"
             :style="slideStyle(index)"
-            :aria-label="`切换到 ${item.title}`"
-            @click="activeIndex = index"
+            :aria-label="getSlideAriaLabel(item, index)"
+            @click="onSlideClick(item, index)"
           >
             <span class="event-carousel__slide-aura" aria-hidden="true"></span>
             <span class="event-carousel__slide-media">
@@ -83,6 +83,14 @@ const props = withDefaults(
 
 const activeIndex = ref(0)
 
+function getSlideAriaLabel(item: CarouselItem, index: number): string {
+  if (index === activeIndex.value && item.href) {
+    return `打开 ${item.title}`
+  }
+
+  return `切换到 ${item.title}`
+}
+
 function getOffset(index: number): number {
   const total = props.items.length
   let diff = index - activeIndex.value
@@ -122,6 +130,15 @@ function goPrev(): void {
 function goNext(): void {
   const total = props.items.length
   activeIndex.value = (activeIndex.value + 1) % total
+}
+
+function onSlideClick(item: CarouselItem, index: number): void {
+  if (index === activeIndex.value && item.href) {
+    window.location.href = item.href
+    return
+  }
+
+  activeIndex.value = index
 }
 
 watch(
