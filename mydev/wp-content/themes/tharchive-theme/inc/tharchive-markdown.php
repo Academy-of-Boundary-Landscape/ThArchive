@@ -5,6 +5,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * 生成不会被 Markdown 强调规则误伤的占位符键。
+ *
+ * @param array  $placeholders 当前占位符缓存。
+ * @param string $type 占位符类型。
+ * @return string
+ */
+function tharchive_markdown_placeholder_key( array $placeholders, $type ) {
+	return '%%THARCHIVE' . strtoupper( sanitize_key( (string) $type ) ) . count( $placeholders ) . '%%';
+}
+
+/**
  * 渲染 Markdown 或回退处理普通正文。
  *
  * @param string $text 原始正文。
@@ -82,6 +93,11 @@ function tharchive_render_markdown( $text ) {
 			continue;
 		}
 
+		if ( preg_match( '/^(?:[_*-]\s*){3,}$/', preg_replace( '/\s+/', '', $block ) ) ) {
+			$html_parts[] = '<hr>';
+			continue;
+		}
+
 		$paragraph = implode( "<br>\n", array_map(
 			static function( $line ) use ( &$placeholders ) {
 				return tharchive_markdown_render_inline( $line, $placeholders );
@@ -110,7 +126,7 @@ function tharchive_markdown_render_inline( $text, array &$placeholders ) {
 	$text = preg_replace_callback(
 		'/`([^`]+)`/',
 		static function( $matches ) use ( &$placeholders ) {
-			$key = '__THARCHIVE_CODE_' . count( $placeholders ) . '__';
+			$key = tharchive_markdown_placeholder_key( $placeholders, 'code' );
 			$placeholders[ $key ] = '<code>' . esc_html( $matches[1] ) . '</code>';
 
 			return $key;
@@ -118,11 +134,9 @@ function tharchive_markdown_render_inline( $text, array &$placeholders ) {
 		$text
 	);
 
-	$text = esc_html( $text );
-
 	$text = preg_replace_callback(
 		'/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]+)")?\)/',
-		static function( $matches ) {
+		static function( $matches ) use ( &$placeholders ) {
 			$label = esc_html( $matches[1] );
 			$url   = esc_url( $matches[2] );
 			$title = ! empty( $matches[3] ) ? ' title="' . esc_attr( $matches[3] ) . '"' : '';
@@ -131,10 +145,15 @@ function tharchive_markdown_render_inline( $text, array &$placeholders ) {
 				return $label;
 			}
 
-			return '<a href="' . $url . '"' . $title . ' target="_blank" rel="noreferrer noopener">' . $label . '</a>';
+			$key = tharchive_markdown_placeholder_key( $placeholders, 'link' );
+			$placeholders[ $key ] = '<a href="' . $url . '"' . $title . ' target="_blank" rel="noreferrer noopener">' . $label . '</a>';
+
+			return $key;
 		},
 		$text
 	);
+
+	$text = esc_html( $text );
 
 	$replacements = array(
 		'/\*\*(.+?)\*\*/s' => '<strong>$1</strong>',
@@ -147,6 +166,24 @@ function tharchive_markdown_render_inline( $text, array &$placeholders ) {
 	foreach ( $replacements as $pattern => $replacement ) {
 		$text = preg_replace( $pattern, $replacement, $text );
 	}
+
+	$text = preg_replace_callback(
+		'/(?<!["=])(https?:\/\/[^\s<]+)/i',
+		static function( $matches ) use ( &$placeholders ) {
+			$url = esc_url( $matches[1] );
+
+			if ( '' === $url ) {
+				return $matches[1];
+			}
+
+			$label = esc_html( $matches[1] );
+			$key   = tharchive_markdown_placeholder_key( $placeholders, 'link' );
+			$placeholders[ $key ] = '<a href="' . $url . '" target="_blank" rel="noreferrer noopener">' . $label . '</a>';
+
+			return $key;
+		},
+		$text
+	);
 
 	if ( ! empty( $placeholders ) ) {
 		$text = strtr( $text, $placeholders );
@@ -170,6 +207,8 @@ function tharchive_get_markdown_allowed_html() {
 	$allowed['pre'] = array(
 		'class' => true,
 	);
+
+	$allowed['hr'] = array();
 
 	return $allowed;
 }

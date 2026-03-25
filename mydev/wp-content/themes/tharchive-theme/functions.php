@@ -203,6 +203,14 @@ function tharchive_enqueue_assets() {
 			array( 'tharchive-theme-style' ),
 			tharchive_theme_asset_version( 'assets/css/single-relay-event.css' )
 		);
+
+		wp_enqueue_script(
+			'tharchive-single-relay-gallery',
+			get_theme_file_uri( 'assets/js/single-relay-gallery.js' ),
+			array(),
+			tharchive_theme_asset_version( 'assets/js/single-relay-gallery.js' ),
+			true
+		);
 	}
 
 	if ( is_home() || is_archive() || is_post_type_archive( 'relay_event' ) ) {

@@ -12,14 +12,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param mixed  $default 默认值。
  * @return mixed
  */
-function tharchive_get_event_meta( $post_id, $key, $default = '' ) {
-	$value = get_post_meta( $post_id, $key, true );
+if ( ! function_exists( 'tharchive_get_event_meta' ) ) {
+	function tharchive_get_event_meta( $post_id, $key, $default = '' ) {
+		$value = get_post_meta( $post_id, $key, true );
 
-	if ( '' === $value || null === $value ) {
-		return $default;
+		if ( '' === $value || null === $value ) {
+			return $default;
+		}
+
+		return $value;
 	}
-
-	return $value;
 }
 
 /**

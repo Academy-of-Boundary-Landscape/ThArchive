@@ -631,7 +631,80 @@ npm run build:carousel
 
 ---
 
-## 13. 给合作者的最短结论
+## 13. 打包与部署
+
+部署到生产环境时，建议分别打包插件和主题，而不是把整个开发目录一起上传。
+
+### 13.1 先构建插件前端产物
+
+```bash
+cd mydev/wp-content/plugins/tharchive-core
+npm run build
+```
+
+构建后应至少确认这些文件存在：
+
+- `assets/dist/archive-app.js`
+- `assets/dist/archive-app.css`
+- `assets/dist/submission-app.js`
+- `assets/dist/submission-app.css`
+- `assets/dist/carousel-app.js`
+- `assets/dist/carousel-app.css`
+
+### 13.2 打包插件
+
+在插件目录的上一层执行：
+
+```bash
+cd mydev/wp-content/plugins
+zip -r tharchive-core.zip tharchive-core \
+  -x "tharchive-core/node_modules/*" \
+  -x "tharchive-core/src/*" \
+  -x "tharchive-core/.git/*" \
+  -x "tharchive-core/.DS_Store" \
+  -x "tharchive-core/*.log"
+```
+
+### 13.3 打包主题
+
+在主题目录的上一层执行：
+
+```bash
+cd mydev/wp-content/themes
+zip -r tharchive-theme.zip tharchive-theme \
+  -x "tharchive-theme/.git/*" \
+  -x "tharchive-theme/.DS_Store" \
+  -x "tharchive-theme/*.log"
+```
+
+### 13.4 上传到生产站
+
+推荐走 WordPress 后台：
+
+1. 进入 `插件 -> 安装插件 -> 上传插件`
+2. 上传 `tharchive-core.zip`
+3. 启用插件
+4. 进入 `外观 -> 主题 -> 上传主题`
+5. 上传 `tharchive-theme.zip`
+6. 启用主题
+
+### 13.5 上线后最少检查
+
+至少检查这些页面和流程：
+
+- 首页
+- `event-list` 列表页
+- 日历视图
+- 投稿页
+- 单活动页
+- 后台“待审核投稿”
+- 图片上传与图集显示
+
+如果生产站已经有旧版本，建议先备份旧插件目录和旧主题目录，再覆盖更新。
+
+---
+
+## 14. 给合作者的最短结论
 
 如果只记住最重要的几件事，可以记下面这些：
 

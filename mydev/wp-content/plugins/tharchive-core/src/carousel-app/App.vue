@@ -42,6 +42,69 @@ function getThumbnailUrl(event: RelayEventLite): string {
   return event._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? ''
 }
 
+function normalizeDateLike(value?: string): string {
+  return (value ?? '').replace(/\//g, '-').trim()
+}
+
+function parseDate(value?: string): Date | null {
+  const normalized = normalizeDateLike(value)
+  const exactDate = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+
+  if (!exactDate) {
+    return null
+  }
+
+  const year = Number(exactDate[1])
+  const month = Number(exactDate[2])
+  const day = Number(exactDate[3])
+  const parsed = new Date(year, month - 1, day)
+
+  if (Number.isNaN(parsed.getTime())) {
+    return null
+  }
+
+  return parsed
+}
+
+function getEventDateDistance(event: RelayEventLite, nowMs: number): number {
+  const startDate = parseDate(event.meta?.event_date)
+  const endDate = parseDate(event.meta?.event_date_end)
+
+  if (!startDate && !endDate) {
+    const fallbackDate = parseDate(event.date)
+    return fallbackDate ? Math.abs(fallbackDate.getTime() - nowMs) : Number.POSITIVE_INFINITY
+  }
+
+  const startMs = (startDate ?? endDate)!.getTime()
+  const endMs = (endDate ?? startDate)!.getTime()
+  const rangeStart = Math.min(startMs, endMs)
+  const rangeEnd = Math.max(startMs, endMs)
+
+  if (nowMs >= rangeStart && nowMs <= rangeEnd) {
+    return 0
+  }
+
+  return Math.min(Math.abs(nowMs - rangeStart), Math.abs(nowMs - rangeEnd))
+}
+
+function sortRecentEvents(events: RelayEventLite[]): RelayEventLite[] {
+  const nowMs = Date.now()
+
+  return [...events].sort((left, right) => {
+    const leftDistance = getEventDateDistance(left, nowMs)
+    const rightDistance = getEventDateDistance(right, nowMs)
+
+    if (leftDistance !== rightDistance) {
+      return leftDistance - rightDistance
+    }
+
+    const leftDate = parseDate(left.meta?.event_date)?.getTime() ?? 0
+    const rightDate = parseDate(right.meta?.event_date)?.getTime() ?? 0
+
+    return rightDate - leftDate
+  })
+}
+
 function mapEventToCarouselItem(event: RelayEventLite): CarouselItem {
   const eventYear = event.meta?.event_year
   const normalizedYear = eventYear ? String(eventYear) : ''
@@ -63,7 +126,10 @@ async function fetchEvents() {
   try {
     const url = buildWpApiUrl(props.config.restUrl, 'wp/v2/relay_event')
     url.searchParams.set('_embed', '1')
-    url.searchParams.set('per_page', String(props.config.perPage))
+    const requestPerPage = props.config.mode === 'recent'
+      ? Math.min(Math.max(props.config.perPage * 4, 24), 100)
+      : props.config.perPage
+    url.searchParams.set('per_page', String(requestPerPage))
     url.searchParams.set('orderby', props.config.orderby)
     url.searchParams.set('order', props.config.order)
 
@@ -72,7 +138,10 @@ async function fetchEvents() {
     }
 
     const events = await requestJson<RelayEventLite[]>(url)
-    items.value = events.map(mapEventToCarouselItem)
+    const resolvedEvents = props.config.mode === 'recent'
+      ? sortRecentEvents(events).slice(0, props.config.perPage)
+      : events
+    items.value = resolvedEvents.map(mapEventToCarouselItem)
   } catch (err) {
     error.value = '轮播数据加载失败，请稍后重试。'
     console.error('[THArchive][CarouselApp] fetch failed', err)

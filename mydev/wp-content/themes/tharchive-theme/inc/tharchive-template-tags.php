@@ -152,13 +152,6 @@ function tharchive_get_event_action_links( $post_id ) {
 	);
 
 	$archive_link = get_post_type_archive_link( 'relay_event' );
-	if ( $archive_link ) {
-		$links[] = array(
-			'label'    => '返回活动列表',
-			'url'      => $archive_link,
-			'external' => false,
-		);
-	}
 
 	return $links;
 }
@@ -184,10 +177,6 @@ function tharchive_render_event_actions( $post_id ) {
 		$target = ! empty( $link['external'] ) ? ' target="_blank"' : '';
 		$class  = 'tharchive-action';
 
-		if ( '返回活动列表' === $link['label'] ) {
-			$class .= ' tharchive-action--ghost';
-		}
-
 		if ( $is_disabled ) {
 			$items[] = '<span class="' . esc_attr( $class . ' tharchive-action--disabled' ) . '" aria-disabled="true">' . esc_html( (string) $link['label'] ) . '</span>';
 			continue;
@@ -212,7 +201,9 @@ function tharchive_render_event_gallery( $post_id ) {
 		return '';
 	}
 
-	$items = array();
+	$slides = array();
+	$thumbs = array();
+	$index  = 0;
 
 	foreach ( $image_ids as $image_id ) {
 		$image_id = absint( $image_id );
@@ -221,29 +212,87 @@ function tharchive_render_event_gallery( $post_id ) {
 			continue;
 		}
 
-		$full_url   = wp_get_attachment_image_url( $image_id, 'full' );
-		$image_html = wp_get_attachment_image( $image_id, 'large', false, array( 'loading' => 'lazy' ) );
-		$caption    = wp_get_attachment_caption( $image_id );
+		$full_url    = wp_get_attachment_image_url( $image_id, 'full' );
+		$image_html  = wp_get_attachment_image(
+			$image_id,
+			'large',
+			false,
+			array(
+				'loading' => 'lazy',
+			)
+		);
+		$thumb_html  = wp_get_attachment_image(
+			$image_id,
+			'medium',
+			false,
+			array(
+				'loading' => 'lazy',
+			)
+		);
+		$caption     = wp_get_attachment_caption( $image_id );
+		$slide_class = 'tharchive-gallery__slide';
 
-		if ( ! $full_url || ! $image_html ) {
+		if ( 0 === $index ) {
+			$slide_class .= ' is-active';
+		}
+
+		if ( ! $full_url || ! $image_html || ! $thumb_html ) {
 			continue;
 		}
 
-		$item = '<figure class="tharchive-gallery__item"><a href="' . esc_url( $full_url ) . '" target="_blank" rel="noreferrer noopener">' . $image_html . '</a>';
+		$slide  = '<figure class="' . esc_attr( $slide_class ) . '" data-gallery-index="' . esc_attr( (string) $index ) . '">';
+		$slide .= '<a class="tharchive-gallery__link" href="' . esc_url( $full_url ) . '" target="_blank" rel="noreferrer noopener">';
+		$slide .= '<span class="tharchive-gallery__media">' . $image_html . '</span>';
+		$slide .= '<span class="tharchive-gallery__hint">' . esc_html__( '查看原图', 'tharchive-theme' ) . '</span>';
+		$slide .= '</a>';
 
 		if ( $caption ) {
-			$item .= '<figcaption>' . esc_html( $caption ) . '</figcaption>';
+			$slide .= '<figcaption class="tharchive-gallery__caption">' . esc_html( $caption ) . '</figcaption>';
 		}
 
-		$item .= '</figure>';
-		$items[] = $item;
+		$slide .= '</figure>';
+
+		$thumb_class  = 'tharchive-gallery__thumb';
+		$thumb_class .= 0 === $index ? ' is-active' : '';
+
+		$thumb  = '<button type="button" class="' . esc_attr( $thumb_class ) . '" data-gallery-thumb="' . esc_attr( (string) $index ) . '" aria-label="' . esc_attr( sprintf( __( '查看第 %d 张图片', 'tharchive-theme' ), $index + 1 ) ) . '"';
+		$thumb .= 0 === $index ? ' aria-current="true"' : '';
+		$thumb .= '>';
+		$thumb .= '<span class="tharchive-gallery__thumb-media">' . $thumb_html . '</span>';
+		$thumb .= '</button>';
+
+		$slides[] = $slide;
+		$thumbs[] = $thumb;
+		$index++;
 	}
 
-	if ( empty( $items ) ) {
+	if ( empty( $slides ) ) {
 		return '';
 	}
 
-	return '<div class="tharchive-gallery">' . implode( '', $items ) . '</div>';
+	$multi_class = count( $slides ) > 1 ? ' has-multiple' : ' is-single';
+	$output      = '<div class="tharchive-gallery' . esc_attr( $multi_class ) . '" data-tharchive-gallery="1" tabindex="0">';
+	$output     .= '<div class="tharchive-gallery__stage">';
+
+	if ( count( $slides ) > 1 ) {
+		$output .= '<button type="button" class="tharchive-gallery__nav tharchive-gallery__nav--prev" data-gallery-nav="prev" aria-label="' . esc_attr__( '上一张图片', 'tharchive-theme' ) . '"><span aria-hidden="true">&lsaquo;</span></button>';
+	}
+
+	$output .= '<div class="tharchive-gallery__viewport">' . implode( '', $slides ) . '</div>';
+
+	if ( count( $slides ) > 1 ) {
+		$output .= '<button type="button" class="tharchive-gallery__nav tharchive-gallery__nav--next" data-gallery-nav="next" aria-label="' . esc_attr__( '下一张图片', 'tharchive-theme' ) . '"><span aria-hidden="true">&rsaquo;</span></button>';
+	}
+
+	$output .= '</div>';
+
+	if ( count( $thumbs ) > 1 ) {
+		$output .= '<div class="tharchive-gallery__thumbs" role="tablist" aria-label="' . esc_attr__( '活动图集缩略图', 'tharchive-theme' ) . '">' . implode( '', $thumbs ) . '</div>';
+	}
+
+	$output .= '</div>';
+
+	return $output;
 }
 
 /**

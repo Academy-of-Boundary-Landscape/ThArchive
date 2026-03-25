@@ -22,6 +22,8 @@ require_once THARCHIVE_CORE_PATH . 'includes/meta-fields.php';
 require_once THARCHIVE_CORE_PATH . 'includes/admin-meta-boxes.php';
 require_once THARCHIVE_CORE_PATH . 'includes/admin-save.php';
 require_once THARCHIVE_CORE_PATH . 'includes/admin-review.php';
+require_once THARCHIVE_CORE_PATH . 'includes/admin-export.php';
+require_once THARCHIVE_CORE_PATH . 'includes/admin-import.php';
 require_once THARCHIVE_CORE_PATH . 'includes/submission-form.php';
 require_once THARCHIVE_CORE_PATH . 'includes/submission-handler.php';
 require_once THARCHIVE_CORE_PATH . 'includes/archive-app.php';

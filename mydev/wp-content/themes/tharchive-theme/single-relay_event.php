@@ -15,9 +15,9 @@ while ( have_posts() ) :
 	$content_html    = tharchive_render_markdown( get_post_field( 'post_content', $post_id ) );
 	$source_raw_text = trim( (string) tharchive_get_event_meta( $post_id, 'source_raw_text', '' ) );
 	$hero_image      = get_the_post_thumbnail( $post_id, 'large', array( 'class' => 'tharchive-hero__image' ) );
-	$meta_cards      = tharchive_render_event_meta_cards( $post_id );
 	$gallery_html    = tharchive_render_event_gallery( $post_id );
 	$action_html     = tharchive_render_event_actions( $post_id );
+	$topic_html      = tharchive_render_event_term_group( $post_id, 'touhou_topic', '主题标签', false );
 	?>
 
 	<article <?php post_class( 'tharchive-relay-event' ); ?>>
@@ -39,11 +39,18 @@ while ( have_posts() ) :
 							</div>
 						<?php endif; ?>
 
+						<?php echo wp_kses_post( tharchive_render_event_term_group( $post_id, 'event_status', '活动状态', false ) ); ?>
 						<?php echo wp_kses_post( tharchive_render_event_term_group( $post_id, 'touhou_character', '东方角色', false ) ); ?>
 						<?php echo wp_kses_post( tharchive_render_event_term_group( $post_id, 'organizer', '主办方', false ) ); ?>
 					</div>
 
 					<?php echo wp_kses_post( $action_html ); ?>
+
+					<?php if ( $topic_html ) : ?>
+						<div class="tharchive-hero__topics">
+							<?php echo wp_kses_post( $topic_html ); ?>
+						</div>
+					<?php endif; ?>
 				</div>
 
 				<?php if ( $hero_image ) : ?>
@@ -53,13 +60,6 @@ while ( have_posts() ) :
 				<?php endif; ?>
 			</div>
 		</section>
-
-		<?php if ( $meta_cards ) : ?>
-			<section class="tharchive-panel tharchive-relay-event__section">
-				<h2 class="tharchive-section-title"><?php esc_html_e( '活动信息', 'tharchive-theme' ); ?></h2>
-				<?php echo wp_kses_post( $meta_cards ); ?>
-			</section>
-		<?php endif; ?>
 
 		<?php if ( $content_html ) : ?>
 			<section class="tharchive-panel tharchive-relay-event__section">

@@ -22,10 +22,13 @@ export interface CarouselItem {
 
 export interface RelayEventLite {
   id: number
+  date?: string
   link?: string
   title?: { rendered?: string }
   excerpt?: { rendered?: string }
   meta?: {
+    event_date?: string
+    event_date_end?: string
     event_year?: number | string
   }
   _embedded?: {

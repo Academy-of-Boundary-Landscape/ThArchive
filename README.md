@@ -90,15 +90,26 @@
 
 - `mydev/wp-content/plugins/tharchive-core`
 - `mydev/wp-content/themes/tharchive-theme`
+- `scripts`
 
 可以这样理解：
 
 - 插件负责数据结构、投稿、审核、归档、轮播等核心功能
 - 主题负责首页、单活动页和全站视觉风格
+- `scripts` 负责旧数据整理、Markdown 预处理、大模型抽取和导入前的数据加工
 
 ---
 
-## 4. 文档入口
+## 4. 最近更新
+
+### 2026.3.25
+
+- 优化了 `tharchive-theme` 的单活动页，重点修复 Markdown 正文渲染与链接显示问题，并调整了首屏信息区布局。
+- 单活动页的活动图集改成了带大图、缩略图和箭头切换的轻量轮播展示。
+- `tharchive-core` 新增旧文章导出与 `relay_event` JSON 导入工具，可配合大模型流水线整理历史 Elementor 数据。
+- 后台增加了“待补关键字段”相关筛选与管理入口，方便导入后继续人工补齐信息。
+
+## 5. 文档入口
 
 如果你只是维护站点，先看这个 README 就够了。
 
