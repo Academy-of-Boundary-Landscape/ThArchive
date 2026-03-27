@@ -1,0 +1,50 @@
+.bili-html-cleaner__grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.bili-html-cleaner__panel {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	padding: 16px;
+	box-sizing: border-box;
+}
+
+.bili-html-cleaner__panel--full {
+	grid-column: 1 / -1;
+}
+
+.bili-html-cleaner__panel-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.bili-html-cleaner__panel-head h2 {
+	margin: 0;
+}
+
+.bili-html-cleaner textarea.code {
+	font-family: SFMono-Regular, Consolas, Monaco, monospace;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+@media (max-width: 960px) {
+	.bili-html-cleaner__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.bili-html-cleaner__panel--full {
+		grid-column: auto;
+	}
+
+	.bili-html-cleaner__panel-head {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}

@@ -1,0 +1,19 @@
+{
+  "name": "local/bili-html-cleaner",
+  "description": "WordPress admin tool for cleaning Bilibili article HTML into Markdown and a reusable LLM prompt.",
+  "type": "wordpress-plugin",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "wordpress",
+    "bilibili",
+    "markdown",
+    "html-cleaner"
+  ],
+  "require": {
+    "league/html-to-markdown": "^5.1"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}
