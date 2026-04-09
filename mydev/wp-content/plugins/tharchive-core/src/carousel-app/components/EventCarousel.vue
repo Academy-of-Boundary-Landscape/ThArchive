@@ -250,7 +250,6 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   z-index: 1;
   transition: opacity 0.35s ease, transform 0.35s ease;
   transform: scale(calc(1 - (var(--abs-offset) * 0.02)));
-  will-change: opacity, transform;
 }
 
 .event-carousel__slide.is-active {
@@ -480,6 +479,26 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
       translateZ(calc(var(--abs-offset) * -70px))
       rotateY(calc(var(--offset) * -13deg))
       scale(calc(1 - (var(--abs-offset) * 0.18)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-carousel__slide,
+  .event-carousel__slide-aura,
+  .event-carousel__slide-gloss,
+  .event-carousel__thumb {
+    transition: none;
+  }
+
+  .event-carousel__slide {
+    transform: translate(-50%, -50%) translateX(calc(var(--offset) * 68%));
+    opacity: calc(1 - (var(--abs-offset) * 0.28));
+    filter: none;
+  }
+
+  .event-carousel__slide.is-active {
+    transform: translate(-50%, -50%);
+    opacity: 1;
   }
 }
 </style>
