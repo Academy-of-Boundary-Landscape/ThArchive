@@ -2,7 +2,7 @@
 /**
  * Plugin Name: THArchive Core
  * Description: 东方Project同人活动归档站核心
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: renko_1055
  * Last Updated: 2026.3.24
  */

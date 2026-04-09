@@ -7,34 +7,56 @@
   /* 移除了 overflow: hidden 以允许星图延伸至全屏并覆盖 footer */
 }
 
-/* 星盘穹顶网格及鼠标探照灯效果 */
+/* 星盘穹顶网格：静态层，只光栅化一次 */
 .front-page-main::before {
   content: "";
-  position: fixed; /* 变为视口固定，填充满整个屏幕 */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
   pointer-events: none;
-  
-  /* 
+
+  /*
      弧形星盘效果：圆心在屏幕正下方，制造巨大圆弧的深度感
-     1. 同心大圆弧（间距缩小，变密）
-     2. 发射状经线（透明度降低、线宽变极细避免变粗光束，且间距变小）
+     1. 同心大圆弧
+     2. 发射状经线
+     此处不再绑定 mask，背景在低透明度下常态可见，
+     探照灯效果由独立的 .front-page-curtain 元素实现（通过 transform 移动，零重绘）。
   */
-  background-image: 
+  background-image:
     repeating-radial-gradient(circle at 50% 150%, transparent 0, transparent 49px, rgba(140, 180, 255, 0.25) 50px),
     repeating-conic-gradient(from 0deg at 50% 150%, rgba(140, 180, 255, 0.08) 0deg, transparent 0.1deg, transparent 2.5deg);
   background-position: center bottom;
+  /* 常态极低透明度，由暗幕元素遮挡，鼠标附近通过暗幕开口显示全亮 */
+  opacity: 0.18;
+}
 
-  /* 
-     鼠标光晕遮罩：配合 fixed 布局。
-     使用 -999px 使得常态下（鼠标未移动获取坐标时）探照灯位于屏幕外，实现完全隐藏。
-     进一步收缩半径到 180px 并加强透明度衰减，只照亮鼠标焦点周边非常小的一块。
-  */
-  -webkit-mask-image: radial-gradient(circle 180px at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
-  mask-image: radial-gradient(circle 180px at var(--mouse-x, -999px) var(--mouse-y, -999px), rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+/*
+   探照灯暗幕：一个超大的暗色元素，中心有一个圆形透明开口。
+   仅通过 transform 定位（compositor 线程，不触发 repaint/layout），
+   替代原本需要每帧重新光栅化 mask-image + conic-gradient 的方案。
+*/
+.front-page-curtain {
+  position: fixed;
+  /* 足够大以保证在任何鼠标位置都能覆盖全屏 */
+  width: 4000px;
+  height: 4000px;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 2; /* 遮挡 ::before (z-index:1)，低于 .front-hero (z-index:10) */
+  /* 圆心在元素中心，中心开口半径 180px，向外渐变到不透明黑色 */
+  background: radial-gradient(
+    circle 180px at 50% 50%,
+    transparent 0%,
+    transparent 58%,
+    rgba(0, 0, 0, 0.97) 82%
+  );
+  will-change: transform;
+  /* 初始状态：将开口移出屏幕（transform 平移） */
+  transform: translate(calc(-50% - 9999px), -50%);
 }
 
 .front-hero {

@@ -28,6 +28,8 @@
                 :src="item.imageUrl"
                 :alt="item.title"
                 class="event-carousel__slide-image"
+                :loading="Math.abs(getOffset(index)) <= 1 ? 'eager' : 'lazy'"
+                decoding="async"
               />
               <div v-else class="event-carousel__slide-image event-carousel__slide-image--placeholder">NO COVER</div>
             </span>
@@ -59,7 +61,7 @@
           :class="{ 'is-active': index === activeIndex }"
           @click="activeIndex = index"
         >
-          <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.title" class="event-carousel__thumb-image" />
+          <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.title" class="event-carousel__thumb-image" loading="lazy" decoding="async" />
           <div v-else class="event-carousel__thumb-image event-carousel__thumb-image--placeholder">NO IMAGE</div>
         </button>
       </div>
@@ -278,10 +280,12 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.14) 22%, rgba(255, 255, 255, 0) 48%),
-    radial-gradient(120% 90% at 78% 18%, rgba(130, 168, 255, 0.22), rgba(130, 168, 255, 0) 62%);
+    linear-gradient(120deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.11) 22%, rgba(255, 255, 255, 0) 48%),
+    radial-gradient(120% 90% at 78% 18%, rgba(130, 168, 255, 0.18), rgba(130, 168, 255, 0) 62%);
   opacity: max(0, var(--light-opacity));
-  mix-blend-mode: screen;
+  /* mix-blend-mode: screen 在深色背景下效果与 normal 几乎相同，
+     但会强制为每个可见 slide 创建独立 GPU 合成层。移除以减少合成层数量。
+     光效透明度微调 0.38→0.32 / 0.22→0.18 以视觉补偿。 */
   transition: opacity 0.35s ease;
   z-index: 3;
 }
