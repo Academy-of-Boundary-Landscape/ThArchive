@@ -22,8 +22,8 @@
      弧形星盘效果：圆心在屏幕正下方，制造巨大圆弧的深度感
      1. 同心大圆弧
      2. 发射状经线
-     此处不再绑定 mask，背景在低透明度下常态可见，
-     探照灯效果由独立的 .front-page-curtain 元素实现（通过 transform 移动，零重绘）。
+     静态层，不绑定任何 CSS 变量，只光栅化一次。
+     探照灯光晕由 .front-page-spotlight 元素负责（transform 定位，零重绘）。
   */
   background-image:
     repeating-radial-gradient(circle at 50% 150%, transparent 0, transparent 49px, rgba(140, 180, 255, 0.25) 50px),
@@ -34,29 +34,28 @@
 }
 
 /*
-   探照灯暗幕：一个超大的暗色元素，中心有一个圆形透明开口。
-   仅通过 transform 定位（compositor 线程，不触发 repaint/layout），
-   替代原本需要每帧重新光栅化 mask-image + conic-gradient 的方案。
+   探照灯光晕：固定尺寸小元素，渐变静态居中，仅通过 transform 跟随鼠标。
+   transform 由 compositor 线程处理，零 repaint / 零 layout。
+   透明边缘对星空、流星完全无遮挡。
 */
-.front-page-curtain {
+.front-page-spotlight {
   position: fixed;
-  /* 足够大以保证在任何鼠标位置都能覆盖全屏 */
-  width: 4000px;
-  height: 4000px;
-  top: 50%;
-  left: 50%;
+  width: 440px;
+  height: 440px;
+  /* 初始偏移半径，使元素中心对准 transform 的原点 */
+  top: -220px;
+  left: -220px;
   pointer-events: none;
-  z-index: 2; /* 遮挡 ::before (z-index:1)，低于 .front-hero (z-index:10) */
-  /* 圆心在元素中心，中心开口半径 180px，向外渐变到不透明黑色 */
+  z-index: 1;
   background: radial-gradient(
-    circle 180px at 50% 50%,
-    transparent 0%,
-    transparent 58%,
-    rgba(0, 0, 0, 0.97) 82%
+    circle at 50% 50%,
+    rgba(140, 180, 255, 0.55) 0%,
+    rgba(140, 180, 255, 0.18) 42%,
+    transparent 70%
   );
   will-change: transform;
-  /* 初始状态：将开口移出屏幕（transform 平移） */
-  transform: translate(calc(-50% - 9999px), -50%);
+  /* 初始隐藏：移出屏幕外 */
+  transform: translate(-9999px, -9999px);
 }
 
 .front-hero {
