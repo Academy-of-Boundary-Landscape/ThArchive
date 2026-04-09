@@ -79,7 +79,7 @@
   background-clip: text;
   -webkit-text-fill-color: transparent;
   /* 增强发光效果 */
-  filter: drop-shadow(0 0 20px rgba(124, 226, 255, 0.3));
+  filter: drop-shadow(0 0 8px rgba(124, 226, 255, 0.22));
 }
 
 .front-hero__desc {
@@ -143,7 +143,6 @@
   min-width: 200px;
   /* 即使主页没有框，按钮也应该保持棱角风格 */
   clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-  backdrop-filter: blur(8px);
 }
 
 /* 媒体查询优化 */

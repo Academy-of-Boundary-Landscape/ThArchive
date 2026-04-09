@@ -10,7 +10,7 @@
 ## 1. 组件总览
 
 ### A. 活动列表应用（Archive App）
-- 作用：展示接力活动列表，支持筛选、分页、视图切换（列表/日历/轮播）。
+- 作用：展示接力活动列表，支持筛选、分页、视图切换（列表/日历）。
 - 适用页面：接力活动总览页、归档页。
 - 前端入口产物：
   - assets/dist/archive-app.js
@@ -114,8 +114,10 @@ Shortcode：
 
 支持参数：
 - mode：recent 或 year
+  - recent：按与当前日期的距离排序，展示最近期的活动（含正在进行中的）
+  - year：展示指定年份的活动
 - year：年份（仅 mode=year 时有效）
-- per_page：数量，范围 1-30，默认 12
+- per_page：最终展示数量，范围 1-30，默认 12（mode=recent 时后台会多取数据再筛选）
 - orderby：date、modified、title，默认 date
 - order：desc 或 asc，默认 desc
 - title：轮播标题文本（可选）

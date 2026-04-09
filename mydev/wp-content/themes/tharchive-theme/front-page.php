@@ -56,14 +56,24 @@ get_header();
 
 	<script>
 		// 为主页星盘背景更新鼠标探照灯视口坐标
-		document.addEventListener('mousemove', function(e) {
+		// 使用 requestAnimationFrame 节流，避免 mousemove 以 100Hz+ 频率触发 GPU 重绘
+		(function() {
 			const frontPageMain = document.querySelector('.front-page-main');
-			if (frontPageMain) {
-				// 改为了配合 position: fixed 定位直接使用客户端的视窗坐标 clientX/clientY
-				frontPageMain.style.setProperty('--mouse-x', `${e.clientX}px`);
-				frontPageMain.style.setProperty('--mouse-y', `${e.clientY}px`);
-			}
-		});
+			if (!frontPageMain) return;
+			let rafPending = false;
+			let pendingX = -999, pendingY = -999;
+			document.addEventListener('mousemove', function(e) {
+				pendingX = e.clientX;
+				pendingY = e.clientY;
+				if (rafPending) return;
+				rafPending = true;
+				requestAnimationFrame(function() {
+					frontPageMain.style.setProperty('--mouse-x', pendingX + 'px');
+					frontPageMain.style.setProperty('--mouse-y', pendingY + 'px');
+					rafPending = false;
+				});
+			});
+		})();
 	</script>
 
 <?php

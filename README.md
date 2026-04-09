@@ -86,7 +86,7 @@
 
 ## 3. 项目结构
 
-项目里最重要的只有两部分：
+项目里最重要的三部分：
 
 - `mydev/wp-content/plugins/tharchive-core`
 - `mydev/wp-content/themes/tharchive-theme`
@@ -117,5 +117,3 @@
 
 - [合作者技术文档](docs/COLLABORATOR_GUIDE.md)
 - [关于页草稿](docs/about-update-log.md)
-- [旧版投稿相关记录](docs/submission-app.md)
-- [投稿流程迭代记录](docs/submission-v2.md)

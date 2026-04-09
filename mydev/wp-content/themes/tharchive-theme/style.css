@@ -16,10 +16,6 @@ Text Domain: tharchive-theme
  * Global reusable stylesheet.
  * Page-specific styles live in assets/css/*.css
  */
-/*
-Theme Name: THArchive Theme
-...
-*/
 
 :root {
   /* 极致深邃的星空底色 - 纯黑 */
@@ -49,9 +45,16 @@ Theme Name: THArchive Theme
   --glow-strong: 0 0 30px rgba(140, 230, 255, 0.4);
 
   /* 统一的斜切角维度 (代替 border-radius) */
+  --angle-xs: 6px;
   --angle-sm: 8px;
+  --angle-card: 12px;
+  --angle-action: 10px;
   --angle-md: 16px;
+  --angle-media: 18px;
   --angle-lg: 24px;
+
+  /* 正文链接高亮色 */
+  --accent-prose: #c4f3ff;
 
   --content-width: 1120px;
   --reading-width: 820px;
@@ -149,7 +152,6 @@ body::after {
   height: 2px;
   background: linear-gradient(90deg, transparent 0%, rgba(140,230,255,0.4) 60%, rgba(255,255,255,1) 100%);
   opacity: 0;
-  filter: drop-shadow(0 0 4px #8ce6ff);
   transform: rotate(135deg);
   border-radius: 999px 0 0 999px;
 }
@@ -206,7 +208,7 @@ body::after {
 a {
   color: var(--accent-2);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 a:hover {
   color: #fff;
@@ -304,7 +306,9 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   /* 对角斜切 */
   clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              text-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* 按钮静态边框 (伪元素) */
@@ -321,10 +325,10 @@ h1, h2, h3, h4, h5, h6 {
 .button::after {
   content: "";
   position: absolute;
-  top: 0; left: -100%;
+  top: 0; left: 0;
   width: 50%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(140, 230, 255, 0.4), transparent);
-  transform: skewX(-20deg);
+  transform: skewX(-20deg) translateX(-200%);
   transition: none;
 }
 
@@ -341,8 +345,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes starlight-sweep {
-  0% { left: -100%; }
-  100% { left: 200%; }
+  0% { transform: skewX(-20deg) translateX(-200%); }
+  100% { transform: skewX(-20deg) translateX(400%); }
 }
 
 /* =========================================
@@ -373,9 +377,9 @@ h1, h2, h3, h4, h5, h6 {
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  background: rgba(2, 4, 10, 0.46);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: rgba(2, 4, 10, 0.72);
   border-bottom: 1px solid var(--line);
 }
 
@@ -414,7 +418,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-size: 0.98rem;
   letter-spacing: 0.06em;
-  color: #f8fbff;
+  color: var(--text);
 }
 
 .tharchive-site-nav {
@@ -437,7 +441,7 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   color: var(--text-soft);
   background: rgba(16, 22, 38, 0.26);
-  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  clip-path: polygon(var(--angle-xs) 0, 100% 0, 100% calc(100% - var(--angle-xs)), calc(100% - var(--angle-xs)) 100%, 0 100%, 0 var(--angle-xs));
   border: 1px solid rgba(140, 180, 255, 0.18);
 }
 .tharchive-site-nav a:hover {
@@ -459,14 +463,14 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-dim);
   border: 1px solid rgba(140, 180, 255, 0.22);
   background: rgba(10, 16, 30, 0.25);
-  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  clip-path: polygon(var(--angle-xs) 0, 100% 0, 100% calc(100% - var(--angle-xs)), calc(100% - var(--angle-xs)) 100%, 0 100%, 0 var(--angle-xs));
 }
 
 .tharchive-header-status__dot {
   width: 6px;
   height: 6px;
   border-radius: 999px;
-  background: #8ce6ff;
+  background: var(--accent-2);
   box-shadow: 0 0 10px rgba(140, 230, 255, 0.9);
 }
 
@@ -474,8 +478,8 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 28px;
   border-top: 1px solid var(--line);
   background: rgba(2, 4, 10, 0.36);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .tharchive-site-footer {
@@ -493,7 +497,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 0 10px;
   font-family: var(--font-display);
   font-size: 0.84rem;
-  color: #f5f9ff;
+  color: var(--text);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -633,8 +637,20 @@ input:focus, textarea:focus {
     width: 100%;
     justify-content: center;
   }
+}
 
-  .tharchive-site-footer {
-    flex-direction: column;
+@media (prefers-reduced-motion: reduce) {
+  .stars-layer-1,
+  .stars-layer-2 {
+    animation: none;
+    opacity: 0.8;
+  }
+
+  .meteor {
+    display: none;
+  }
+
+  .button:hover::after {
+    animation: none;
   }
 }

@@ -29,12 +29,12 @@
   inset: 18px;
   border: 1px solid rgba(140, 230, 255, 0.12);
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
   pointer-events: none;
 }
@@ -91,12 +91,12 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 14px 32px rgba(0, 0, 0, 0.18);
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
 }
 
@@ -195,12 +195,12 @@
   text-decoration: none;
   font-weight: 600;
   clip-path: polygon(
-    10px 0,
+    var(--angle-action) 0,
     100% 0,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
+    100% calc(100% - var(--angle-action)),
+    calc(100% - var(--angle-action)) 100%,
     0 100%,
-    0 10px
+    0 var(--angle-action)
   );
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
@@ -247,12 +247,12 @@
   background: linear-gradient(180deg, rgba(11, 18, 31, 0.84), rgba(7, 12, 22, 0.74));
   border: 1px solid rgba(140, 230, 255, 0.14);
   clip-path: polygon(
-    18px 0,
+    var(--angle-media) 0,
     100% 0,
-    100% calc(100% - 18px),
-    calc(100% - 18px) 100%,
+    100% calc(100% - var(--angle-media)),
+    calc(100% - var(--angle-media)) 100%,
     0 100%,
-    0 18px
+    0 var(--angle-media)
   );
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.34);
 }
@@ -273,12 +273,12 @@
   height: clamp(240px, 34vw, 360px);
   object-fit: cover;
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
 }
 
@@ -301,12 +301,12 @@
   border: 1px solid rgba(140, 230, 255, 0.14);
   background: rgba(8, 14, 24, 0.46);
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
 }
 
@@ -364,7 +364,7 @@
 }
 
 .tharchive-prose a {
-  color: #c4f3ff;
+  color: var(--accent-prose);
   text-decoration: underline;
   text-decoration-color: rgba(140, 230, 255, 0.52);
   text-decoration-thickness: 0.08em;
@@ -420,7 +420,7 @@
 .tharchive-details__body code {
   padding: 0.14em 0.42em;
   background: rgba(140, 180, 255, 0.12);
-  color: #f8fbff;
+  color: var(--text);
   font-family: var(--font-mono);
   font-size: 0.94em;
 }
@@ -470,12 +470,12 @@
     linear-gradient(180deg, rgba(10, 18, 30, 0.72), rgba(7, 12, 22, 0.58)),
     radial-gradient(circle at top right, rgba(140, 230, 255, 0.12), transparent 42%);
   clip-path: polygon(
-    16px 0,
+    var(--angle-md) 0,
     100% 0,
-    100% calc(100% - 16px),
-    calc(100% - 16px) 100%,
+    100% calc(100% - var(--angle-md)),
+    calc(100% - var(--angle-md)) 100%,
     0 100%,
-    0 16px
+    0 var(--angle-md)
   );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
@@ -497,17 +497,17 @@
   padding: 0;
   border: 1px solid rgba(140, 230, 255, 0.22);
   background: linear-gradient(180deg, rgba(10, 18, 30, 0.72), rgba(7, 12, 22, 0.62));
-  color: #edf7ff;
+  color: var(--text);
   font-size: 1.9rem;
   line-height: 1;
   cursor: pointer;
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
   box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
   transition:
@@ -531,12 +531,12 @@
   text-decoration: none;
   overflow: hidden;
   clip-path: polygon(
-    12px 0,
+    var(--angle-card) 0,
     100% 0,
-    100% calc(100% - 12px),
-    calc(100% - 12px) 100%,
+    100% calc(100% - var(--angle-card)),
+    calc(100% - var(--angle-card)) 100%,
     0 100%,
-    0 12px
+    0 var(--angle-card)
   );
 }
 
@@ -591,12 +591,12 @@
   transform: translateY(8px);
   transition: opacity 0.24s ease, transform 0.24s ease, border-color 0.24s ease, color 0.24s ease;
   clip-path: polygon(
-    8px 0,
+    var(--angle-sm) 0,
     100% 0,
-    100% calc(100% - 8px),
-    calc(100% - 8px) 100%,
+    100% calc(100% - var(--angle-sm)),
+    calc(100% - var(--angle-sm)) 100%,
     0 100%,
-    0 8px
+    0 var(--angle-sm)
   );
 }
 
@@ -643,12 +643,12 @@
   background: rgba(8, 14, 24, 0.46);
   cursor: pointer;
   clip-path: polygon(
-    10px 0,
+    var(--angle-action) 0,
     100% 0,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
+    100% calc(100% - var(--angle-action)),
+    calc(100% - var(--angle-action)) 100%,
     0 100%,
-    0 10px
+    0 var(--angle-action)
   );
   overflow: hidden;
   transition:
@@ -769,9 +769,7 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
   }
-}
 
-@media (max-width: 640px) {
   .single-relay_event .tharchive-site-main {
     width: calc(100% - 20px);
   }
