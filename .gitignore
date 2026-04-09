@@ -9,6 +9,7 @@
 !docs/**
 !scripts/
 !scripts/**
+!CONTRIBUTING.md
 
 # Ignore local agent instructions.
 AGENTS.md
