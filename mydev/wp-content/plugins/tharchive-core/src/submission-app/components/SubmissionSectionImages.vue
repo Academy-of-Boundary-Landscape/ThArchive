@@ -116,6 +116,11 @@ const props = defineProps<{
   maxGalleryFiles: number
 }>()
 
+const emit = defineEmits<{
+  'update:coverFile': [file: File | null]
+  'update:galleryFiles': [files: File[]]
+}>()
+
 const acceptAttr = computed(() => props.acceptedImageTypes.join(','))
 const acceptedTypeHint = computed(() => formatAcceptedTypeHint(props.acceptedImageTypes))
 const isGalleryAtLimit = computed(() => props.form.galleryFiles.length >= props.maxGalleryFiles)
@@ -191,7 +196,7 @@ function syncCoverInputFile(file: File | null) {
 }
 
 function removeCover() {
-  props.form.coverFile = null
+  emit('update:coverFile', null)
   revokeCoverPreview()
   if (coverInputRef.value) {
     coverInputRef.value.value = ''
@@ -200,7 +205,7 @@ function removeCover() {
 
 function removeGalleryFile(index: number) {
   const nextFiles = props.form.galleryFiles.filter((_, fileIndex) => fileIndex !== index)
-  props.form.galleryFiles = nextFiles
+  emit('update:galleryFiles', nextFiles)
   syncGalleryInputFiles(nextFiles)
   resetGalleryPreviews()
   galleryPreviewItems.value = nextFiles.map((file) => ({
@@ -213,7 +218,7 @@ function removeGalleryFile(index: number) {
 function onCoverChange(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
-  props.form.coverFile = file
+  emit('update:coverFile', file)
   props.clearError('coverFile')
   revokeCoverPreview()
   if (file) {
@@ -226,7 +231,7 @@ function onGalleryChange(event: Event) {
   const incomingFiles = Array.from(input.files ?? [])
   const mergedFiles = mergeGalleryFiles(props.form.galleryFiles, incomingFiles, props.maxGalleryFiles)
 
-  props.form.galleryFiles = mergedFiles
+  emit('update:galleryFiles', mergedFiles)
   syncGalleryInputFiles(mergedFiles)
   resetGalleryPreviews()
   galleryPreviewItems.value = mergedFiles.map((file) => ({

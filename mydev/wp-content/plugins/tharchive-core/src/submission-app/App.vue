@@ -24,6 +24,7 @@
           :suggestions="bootstrap.suggestions"
           :errors="errors"
           :clear-error="clearError"
+          @update:event-date="form.eventDate = $event"
         />
 
         <submission-section-participation
@@ -47,6 +48,8 @@
           :clear-error="clearError"
           :accepted-image-types="bootstrap.upload.acceptedImageTypes"
           :max-gallery-files="bootstrap.upload.maxGalleryFiles"
+          @update:cover-file="form.coverFile = $event"
+          @update:gallery-files="form.galleryFiles = $event"
         />
 
         <input type="hidden" name="action" :value="bootstrap.action" />
@@ -114,7 +117,6 @@ const isSubmitting = ref(false)
 
 const DRAFT_KEY = 'tharchive_submission_draft_v1'
 const STEP_KEY = 'tharchive_submission_step_v1'
-const SUBMIT_DEBUG_PAYLOAD_KEY = 'tharchive_submission_submit_debug_payload_v1'
 
 const DRAFT_FIELDS: Array<keyof SubmissionFormState> = [
   'title',
@@ -157,112 +159,16 @@ function scrollToFirstError() {
   }
 }
 
-function logActualSubmitPayload() {
-  if (!formRef.value) {
-    console.warn('[THArchive][Submit] 无法记录 payload：formRef 为空')
-    return null
-  }
-
-  const formData = new FormData(formRef.value)
-  const payloadEntries: Array<{ key: string; value: string | Record<string, unknown> }> = []
-
-  formData.forEach((value, key) => {
-    if (value instanceof File) {
-      payloadEntries.push({
-        key,
-        value: {
-          kind: 'file',
-          name: value.name,
-          type: value.type,
-          size: value.size,
-          lastModified: value.lastModified
-        }
-      })
-      return
-    }
-
-    payloadEntries.push({
-      key,
-      value: value
-    })
-  })
-
-  const groupedKeys = payloadEntries.reduce<Record<string, number>>((acc, item) => {
-    acc[item.key] = (acc[item.key] ?? 0) + 1
-    return acc
-  }, {})
-
-  const snapshot = {
-    capturedAt: new Date().toISOString(),
-    totalEntries: payloadEntries.length,
-    groupedKeys,
-    payloadEntries
-  }
-
-  console.info('[THArchive][Submit] 实际发送 payload 快照', snapshot)
-
-  return snapshot
-}
-
-function persistSubmitPayloadSnapshot(snapshot: ReturnType<typeof logActualSubmitPayload>) {
-  if (!snapshot) {
-    return
-  }
-
-  try {
-    sessionStorage.setItem(SUBMIT_DEBUG_PAYLOAD_KEY, JSON.stringify(snapshot))
-  } catch {
-    console.warn('[THArchive][Submit] sessionStorage 写入失败，无法跨刷新保留 payload 快照')
-  }
-}
-
-function replaySubmitPayloadSnapshotFromSession() {
-  const raw = sessionStorage.getItem(SUBMIT_DEBUG_PAYLOAD_KEY)
-  if (!raw) {
-    return
-  }
-
-  try {
-    const snapshot = JSON.parse(raw)
-    console.info('[THArchive][Submit] 上次提交 payload 快照（刷新后恢复）', snapshot)
-  } catch {
-    console.warn('[THArchive][Submit] payload 快照解析失败')
-  } finally {
-    sessionStorage.removeItem(SUBMIT_DEBUG_PAYLOAD_KEY)
-  }
-}
-
 function handleSubmit() {
   if (isSubmitting.value) {
     return
   }
 
   if (!isLastStep.value) {
-    console.warn('[THArchive][Submit] 忽略非最后一步的提交触发', {
-      step: currentStep.value
-    })
     return
   }
 
-  const coverInput = formRef.value?.querySelector<HTMLInputElement>('input[name="tharchive_cover_image"]')
-  const galleryInput = formRef.value?.querySelector<HTMLInputElement>('input[name="tharchive_gallery_images[]"]')
-
-  console.info('[THArchive][Submit] 文件输入状态', {
-    stateCoverFile: form.coverFile?.name ?? null,
-    inputCoverName: coverInput?.files?.[0]?.name ?? null,
-    inputCoverCount: coverInput?.files?.length ?? 0,
-    stateGalleryCount: form.galleryFiles.length,
-    inputGalleryCount: galleryInput?.files?.length ?? 0
-  })
-
-  const snapshot = logActualSubmitPayload()
-  persistSubmitPayloadSnapshot(snapshot)
-
   if (!validateAll()) {
-    console.error('[THArchive][Submit] 前端校验未通过', {
-      step: currentStep.value,
-      errors: { ...errors.value }
-    })
     scrollToFirstError()
     return
   }
@@ -278,10 +184,6 @@ function goPrev() {
 
 function goNext() {
   if (!canMoveToNextStep()) {
-    console.warn('[THArchive][Submit] 当前步骤校验未通过', {
-      step: currentStep.value,
-      errors: { ...errors.value }
-    })
     scrollToFirstError()
     return
   }
@@ -391,34 +293,7 @@ function restoreDraft() {
   }
 }
 
-function logSubmissionResultFromQuery() {
-  const params = new URLSearchParams(window.location.search)
-  const status = params.get('tharchive_submit')
-  const detail = params.get('tharchive_submit_detail')
-
-  if (!status || status === 'success') {
-    return
-  }
-
-  const statusMessages: Record<string, string> = {
-    nonce_error: 'Nonce 校验失败',
-    title_missing: '标题为空',
-    required_missing: '存在缺失必填字段',
-    cover_missing: '封面图缺失',
-    insert_error: 'WordPress 创建文章失败'
-  }
-
-  console.error('[THArchive][Submit] 提交失败', {
-    status,
-    statusMessage: statusMessages[status] ?? '未知错误',
-    detail: detail ?? 'none',
-    query: Object.fromEntries(params.entries())
-  })
-}
-
 onMounted(() => {
-  replaySubmitPayloadSnapshotFromSession()
-  logSubmissionResultFromQuery()
   restoreDraft()
 })
 

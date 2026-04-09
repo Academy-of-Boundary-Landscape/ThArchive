@@ -106,6 +106,10 @@ const props = defineProps<{
   clearError: (field: string) => void
 }>()
 
+const emit = defineEmits<{
+  'update:eventDate': [date: string]
+}>()
+
 type AutoCompleteOption = { label: string; value: string }
 
 const autoCompleteMenuProps = {
@@ -121,7 +125,7 @@ const organizerOptions = computed(() => buildRankedOptions(organizerPool.value, 
 const eventDateValue = computed(() => toSafeFormattedDate(props.form.eventDate))
 
 function onEventDateChange(value: string | null) {
-  props.form.eventDate = value || ''
+  emit('update:eventDate', value || '')
   props.clearError('eventDate')
 }
 
