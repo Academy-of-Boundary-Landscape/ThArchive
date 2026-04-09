@@ -230,9 +230,8 @@ function getStatusClass(name: string): string {
   line-height: 1.45;
   margin-top: 0.1rem;
   padding-bottom: 1px;
-  max-height: none;
-  opacity: 1;
-  transition: max-height 0.25s ease, margin-top 0.25s ease, white-space 0.25s ease;
+  max-height: 1.1rem;
+  transition: max-height 0.25s ease, margin-top 0.25s ease;
 }
 
 .event-excerpt :deep(p) {
@@ -247,10 +246,9 @@ function getStatusClass(name: string): string {
 .cyber-card:hover .event-excerpt,
 .cyber-card:focus-within .event-excerpt {
   margin-top: 0.12rem;
-  display: block;
   white-space: normal;
   text-overflow: clip;
-  max-height: calc(1em * 6.2);
+  max-height: calc(1.45em * 6.2);
   overflow: hidden;
 }
 

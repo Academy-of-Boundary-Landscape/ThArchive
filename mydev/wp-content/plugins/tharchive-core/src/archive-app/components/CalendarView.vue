@@ -301,60 +301,59 @@ onMounted(() => {
     max-height: calc(84vh - 60px);
   }
 }
-</style>
-<style>
+
 /* 覆盖 Naive UI Calendar 在深色模式的基础颜色 */
-.scifi-calendar-panel .n-calendar {
-  --n-text-color: #e2e8f0 !important;
-  --n-title-text-color: #fff !important;
-  --n-day-text-color: rgba(188, 204, 224, 0.72) !important;
-  --n-border-color: rgba(156, 192, 236, 0.14) !important;
-  --n-cell-color-hover: rgba(22, 36, 54, 0.48) !important;
-  --n-bar-color: rgba(140, 230, 255, 0.7) !important;
-  --n-date-color-current: rgba(52, 92, 142, 0.72) !important;
-  --n-date-text-color-current: #f8fbff !important;
-  --n-text-color-disabled: #475569 !important;
+.scifi-calendar-panel :deep(.n-calendar) {
+  --n-text-color: #e2e8f0;
+  --n-title-text-color: #fff;
+  --n-day-text-color: rgba(188, 204, 224, 0.72);
+  --n-border-color: rgba(156, 192, 236, 0.14);
+  --n-cell-color-hover: rgba(22, 36, 54, 0.48);
+  --n-bar-color: rgba(140, 230, 255, 0.7);
+  --n-date-color-current: rgba(52, 92, 142, 0.72);
+  --n-date-text-color-current: #f8fbff;
+  --n-text-color-disabled: #475569;
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-header {
+.scifi-calendar-panel :deep(.n-calendar-header) {
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(156, 192, 236, 0.12);
   margin-bottom: 1rem;
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-header__title {
+.scifi-calendar-panel :deep(.n-calendar-header__title) {
   letter-spacing: 0.08em;
   text-shadow: 0 0 16px rgba(140, 230, 255, 0.12);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-dates {
+.scifi-calendar-panel :deep(.n-calendar-dates) {
   background: linear-gradient(180deg, rgba(6, 12, 20, 0.2) 0%, rgba(4, 8, 16, 0.12) 100%);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-cell {
+.scifi-calendar-panel :deep(.n-calendar-cell) {
   background: rgba(8, 14, 24, 0.08);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-cell:hover {
+.scifi-calendar-panel :deep(.n-calendar-cell:hover) {
   box-shadow: inset 0 0 0 1px rgba(188, 226, 255, 0.12);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-date {
+.scifi-calendar-panel :deep(.n-calendar-date) {
   gap: 0.4rem;
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-date__date {
+.scifi-calendar-panel :deep(.n-calendar-date__date) {
   color: #dbeafe;
   text-shadow: 0 0 10px rgba(140, 230, 255, 0.08);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-cell--current .n-calendar-date__date {
+.scifi-calendar-panel :deep(.n-calendar-cell--current .n-calendar-date__date) {
   box-shadow:
     0 0 0 1px rgba(188, 226, 255, 0.2),
     0 0 18px rgba(82, 168, 255, 0.12);
 }
 
-.scifi-calendar-panel .n-calendar .n-calendar-date__day {
+.scifi-calendar-panel :deep(.n-calendar-date__day) {
   color: rgba(188, 204, 224, 0.72);
 }
 </style>
