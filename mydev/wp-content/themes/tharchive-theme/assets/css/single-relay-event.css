@@ -141,7 +141,7 @@
     0 100%,
     0 9px
   );
-  transition: border-color 0.25s ease, transform 0.25s ease, background-color 0.25s ease;
+  transition: transform 0.25s ease; /* border-color/background-color 移出 */
 }
 
 .tharchive-chip:hover,
@@ -203,7 +203,7 @@
     0 var(--angle-action)
   );
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.28);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+  transition: transform 0.25s ease; /* border-color/box-shadow/background-color 移出 */
 }
 
 .tharchive-action:hover,
@@ -589,7 +589,7 @@
   text-transform: uppercase;
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 0.24s ease, transform 0.24s ease, border-color 0.24s ease, color 0.24s ease;
+  transition: opacity 0.24s ease, transform 0.24s ease; /* border-color/color 移出 */
   clip-path: polygon(
     var(--angle-sm) 0,
     100% 0,
@@ -613,14 +613,15 @@
   width: 100%;
   max-height: min(68vh, 760px);
   object-fit: cover;
-  transition: transform 0.36s ease, opacity 0.28s ease, filter 0.36s ease;
+  /* filter 移出 transition，只保留 compositor 属性（transform/opacity）避免持续 repaint */
+  transition: transform 0.36s ease, opacity 0.28s ease;
 }
 
 .tharchive-gallery__slide:hover img,
 .tharchive-gallery__slide:focus-within img {
   transform: scale(1.045);
   opacity: 0.98;
-  filter: saturate(1.06);
+  /* 移除 filter: saturate(1.06)：filter 不走 compositor，hover 期间持续触发 repaint */
 }
 
 .tharchive-gallery__caption {
@@ -651,11 +652,7 @@
     0 var(--angle-action)
   );
   overflow: hidden;
-  transition:
-    transform 0.24s ease,
-    border-color 0.24s ease,
-    box-shadow 0.24s ease,
-    opacity 0.24s ease;
+  transition: transform 0.24s ease, opacity 0.24s ease; /* border-color/box-shadow 移出 */
 }
 
 .tharchive-gallery__thumb:hover,

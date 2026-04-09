@@ -214,7 +214,8 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   letter-spacing: normal;
   text-transform: none;
   text-shadow: none;
-  transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease, border-color 0.35s ease;
+  /* 只保留 compositor 属性；filter/border-color 移出，瞬间切换代替持续重绘 */
+  transition: transform 0.35s ease, opacity 0.35s ease;
   transform-style: preserve-3d;
   transform: translate(-50%, -50%)
     translateX(calc(var(--offset) * 68%))
@@ -294,7 +295,7 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transform-style: preserve-3d;
+  /* 移除 preserve-3d：伪元素改为 2D 平面渐变条，消除 3D 渲染上下文开销 */
   z-index: 4;
 }
 
@@ -305,8 +306,7 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   right: -8px;
   width: 8px;
   height: 100%;
-  transform-origin: left center;
-  transform: rotateY(92deg);
+  /* 移除 rotateY(92deg)：改为 2D 平面渐变，视觉效果相近，无 3D 变换开销 */
   background: linear-gradient(to right, rgba(244, 248, 255, 0.35), rgba(18, 24, 34, 0.95));
   opacity: max(0.12, var(--edge-opacity));
 }
@@ -318,8 +318,7 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   bottom: -8px;
   width: 100%;
   height: 8px;
-  transform-origin: center top;
-  transform: rotateX(-88deg);
+  /* 移除 rotateX(-88deg)：同上 */
   background: linear-gradient(to bottom, rgba(220, 231, 255, 0.22), rgba(11, 16, 24, 0.94));
   opacity: max(0.15, var(--edge-opacity));
 }
@@ -437,7 +436,7 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   font: inherit;
   letter-spacing: normal;
   text-transform: none;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease; /* border-color 移出 */
   text-align: left;
 }
 

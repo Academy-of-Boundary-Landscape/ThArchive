@@ -7,7 +7,7 @@
   /* 移除了 overflow: hidden 以允许星图延伸至全屏并覆盖 footer */
 }
 
-/* 星盘穹顶网格：静态层，只光栅化一次 */
+/* 星盘穹顶网格：静态层，直接显示，四周渐变消失 */
 .front-page-main::before {
   content: "";
   position: fixed;
@@ -17,45 +17,13 @@
   height: 100vh;
   z-index: 1;
   pointer-events: none;
-
-  /*
-     弧形星盘效果：圆心在屏幕正下方，制造巨大圆弧的深度感
-     1. 同心大圆弧
-     2. 发射状经线
-     静态层，不绑定任何 CSS 变量，只光栅化一次。
-     探照灯光晕由 .front-page-spotlight 元素负责（transform 定位，零重绘）。
-  */
   background-image:
     repeating-radial-gradient(circle at 50% 150%, transparent 0, transparent 49px, rgba(140, 180, 255, 0.25) 50px),
     repeating-conic-gradient(from 0deg at 50% 150%, rgba(140, 180, 255, 0.08) 0deg, transparent 0.1deg, transparent 2.5deg);
   background-position: center bottom;
-  /* 常态极低透明度，由暗幕元素遮挡，鼠标附近通过暗幕开口显示全亮 */
-  opacity: 0.18;
-}
-
-/*
-   探照灯光晕：固定尺寸小元素，渐变静态居中，仅通过 transform 跟随鼠标。
-   transform 由 compositor 线程处理，零 repaint / 零 layout。
-   透明边缘对星空、流星完全无遮挡。
-*/
-.front-page-spotlight {
-  position: fixed;
-  width: 440px;
-  height: 440px;
-  /* 初始偏移半径，使元素中心对准 transform 的原点 */
-  top: -220px;
-  left: -220px;
-  pointer-events: none;
-  z-index: 1;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgba(140, 180, 255, 0.55) 0%,
-    rgba(140, 180, 255, 0.18) 42%,
-    transparent 70%
-  );
-  will-change: transform;
-  /* 初始隐藏：移出屏幕外 */
-  transform: translate(-9999px, -9999px);
+  /* 静态遮罩：中心完整显示，向四周渐变消失，无任何 CSS 变量，只光栅化一次 */
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 60%, black 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 60%, black 30%, transparent 80%);
 }
 
 .front-hero {

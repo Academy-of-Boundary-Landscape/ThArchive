@@ -74,7 +74,7 @@ function getStatusClass(name: string): string {
 <style scoped>
 .cyber-card {
   background: transparent;
-  transition: transform 0.3s, border-color 0.3s;
+  transition: transform 0.3s; /* border-color 移出 */
   overflow: hidden;
   min-height: 72px;
   height: auto;

@@ -182,7 +182,8 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   background: rgba(7, 10, 16, 0.75);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease, border-color 0.35s ease;
+  /* 只保留 compositor 属性；filter/border-color 移出，瞬间切换代替持续重绘 */
+  transition: transform 0.35s ease, opacity 0.35s ease;
   transform-style: preserve-3d;
   transform: translate(-50%, -50%)
     translateX(calc(var(--offset) * 42%))
@@ -328,7 +329,7 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   background: rgba(13, 17, 24, 0.75);
   color: #e2e8f0;
   cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease; /* border-color 移出 */
   text-align: left;
 }
 

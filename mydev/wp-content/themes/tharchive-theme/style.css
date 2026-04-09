@@ -208,7 +208,7 @@ body::after {
 a {
   color: var(--accent-2);
   text-decoration: none;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
+  transition: color 0.3s ease; /* text-shadow 移出：instant 出现可接受，避免每帧 repaint */
 }
 a:hover {
   color: #fff;
@@ -244,7 +244,7 @@ h1, h2, h3, h4, h5, h6 {
     0 100%, 
     0 var(--angle-md)
   );
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease; /* box-shadow 移出：transform 动画已提供足够视觉反馈 */
 }
 
 /* 绘制棱角边框 (因为 clip-path 会裁掉 border) */
@@ -306,9 +306,7 @@ h1, h2, h3, h4, h5, h6 {
   overflow: hidden;
   /* 对角斜切 */
   clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
-  transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              text-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* box-shadow/text-shadow 移出：保留背景渐入作为主要反馈 */
 }
 
 /* 按钮静态边框 (伪元素) */
@@ -318,7 +316,7 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   border: 1px solid var(--line-strong);
   clip-path: polygon(var(--angle-sm) 0, 100% 0, 100% calc(100% - var(--angle-sm)), calc(100% - var(--angle-sm)) 100%, 0 100%, 0 var(--angle-sm));
-  transition: border-color 0.3s ease;
+  transition: none; /* 伪元素边框无需过渡 */
 }
 
 /* 按钮悬停时的星光扫过特效 */

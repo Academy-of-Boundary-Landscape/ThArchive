@@ -18,7 +18,6 @@ get_header();
 ?>
 
 	<section id="primary" class="site-main front-page-main">
-	<div class="front-page-spotlight" aria-hidden="true"></div>
 	<section class="front-hero">
 		<div class="container front-hero__inner">
 			<div class="front-hero__content">
@@ -55,32 +54,6 @@ get_header();
 	</section>
 	</section>
 
-	<script>
-		/*
-		 * 探照灯光晕定位
-		 * 仅更新 .front-page-spotlight 的 transform，由 compositor 线程处理。
-		 * 不触发任何 repaint / layout，彻底消除每帧重绘开销。
-		 */
-		(function() {
-			const spotlight = document.querySelector('.front-page-spotlight');
-			if (!spotlight) return;
-			let rafPending = false;
-			let pendingX = 0, pendingY = 0;
-			document.addEventListener('mousemove', function(e) {
-				pendingX = e.clientX;
-				pendingY = e.clientY;
-				if (rafPending) return;
-				rafPending = true;
-				requestAnimationFrame(function() {
-					spotlight.style.transform = 'translate(' + pendingX + 'px, ' + pendingY + 'px)';
-					rafPending = false;
-				});
-			});
-			document.addEventListener('mouseleave', function() {
-				spotlight.style.transform = 'translate(-9999px, -9999px)';
-			});
-		})();
-	</script>
 
 <?php
 get_footer();
