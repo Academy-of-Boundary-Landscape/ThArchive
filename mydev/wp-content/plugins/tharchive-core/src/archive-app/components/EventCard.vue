@@ -22,7 +22,7 @@
 
       <div class="cyber-card-content">
         <h4 class="event-title">
-          <a :href="event.link" v-html="event.title?.rendered || '未命名活动'"></a>
+          <a :href="event.link">{{ stripHtml(event.title?.rendered) || '未命名活动' }}</a>
         </h4>
 
         <div class="event-meta-row">
@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <div class="event-excerpt" v-html="event.excerpt?.rendered || ''"></div>
+        <div class="event-excerpt">{{ stripHtml(event.excerpt?.rendered) }}</div>
       </div>
     </div>
   </n-card>
@@ -47,6 +47,10 @@ import type { RelayEvent } from '@archive/types';
 defineProps<{
   event: RelayEvent;
 }>();
+
+function stripHtml(value?: string): string {
+  return (value ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+}
 
 function getStatusClass(name: string): string {
   const normalized = name.trim();

@@ -5,14 +5,29 @@
         如果只有一个总结专栏链接，也可以直接提交；管理员会在审核时补充分类与标签。
       </n-alert>
 
-      <n-form-item label="主归档链接 / 总结链接">
+      <n-form-item
+        label="主归档链接 / 总结链接"
+        :validation-status="errors.bilibiliSummaryUrl ? 'error' : undefined"
+        :feedback="errors.bilibiliSummaryUrl"
+        data-field="bilibiliSummaryUrl"
+      >
         <n-input
           v-model:value="form.bilibiliSummaryUrl"
           placeholder="https://"
+          @update:value="clearError('bilibiliSummaryUrl')"
         />
       </n-form-item>
-      <n-form-item label="独立归档站链接">
-        <n-input v-model:value="form.archiveSiteUrl" placeholder="https://" />
+      <n-form-item
+        label="独立归档站链接"
+        :validation-status="errors.archiveSiteUrl ? 'error' : undefined"
+        :feedback="errors.archiveSiteUrl"
+        data-field="archiveSiteUrl"
+      >
+        <n-input
+          v-model:value="form.archiveSiteUrl"
+          placeholder="https://"
+          @update:value="clearError('archiveSiteUrl')"
+        />
       </n-form-item>
     </n-form>
   </n-card>
@@ -24,5 +39,7 @@ import type { SubmissionFormState } from '@submission/types'
 
 defineProps<{
   form: SubmissionFormState
+  errors: Record<string, string>
+  clearError: (field: string) => void
 }>()
 </script>

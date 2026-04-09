@@ -147,7 +147,7 @@ const submitResultMessage = computed(() => {
 })
 
 function scrollToFirstError() {
-  const order = ['title', 'excerpt', 'character', 'organizer', 'eventDate', 'content', 'coverFile']
+  const order = ['title', 'excerpt', 'character', 'organizer', 'eventDate', 'content', 'bilibiliSummaryUrl', 'archiveSiteUrl', 'coverFile']
   const firstError = order.find((key) => errors.value[key])
   if (!firstError) {
     return
@@ -240,8 +240,31 @@ function validateStep1() {
   return true
 }
 
+function isValidUrlOrEmpty(value: string): boolean {
+  if (!value.trim()) {
+    return true
+  }
+  try {
+    const url = new URL(value.trim())
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
 function validateStep2() {
-  return true
+  let valid = true
+
+  if (!isValidUrlOrEmpty(form.bilibiliSummaryUrl)) {
+    errors.value.bilibiliSummaryUrl = '请输入有效的 URL（以 http:// 或 https:// 开头）'
+    valid = false
+  }
+  if (!isValidUrlOrEmpty(form.archiveSiteUrl)) {
+    errors.value.archiveSiteUrl = '请输入有效的 URL（以 http:// 或 https:// 开头）'
+    valid = false
+  }
+
+  return valid
 }
 
 function clearDraftStorage() {

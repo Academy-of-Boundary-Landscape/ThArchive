@@ -34,7 +34,7 @@
                    :title="e.title?.rendered || ''"
                  >
                    <span class="event-dot"></span>
-                   <span class="event-title-trunc" v-html="e.title?.rendered || ''"></span>
+                   <span class="event-title-trunc">{{ stripHtml(e.title?.rendered) }}</span>
                  </div>
                </div>
              </template>
