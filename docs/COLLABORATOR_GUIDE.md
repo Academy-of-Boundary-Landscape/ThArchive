@@ -160,9 +160,9 @@
 
 ### 3.1 插件
 
-主插件目录：
+#### tharchive-core（核心插件）
 
-- `mydev/wp-content/plugins/tharchive-core`
+目录：`mydev/wp-content/plugins/tharchive-core`
 
 它负责：
 
@@ -173,12 +173,26 @@
 
 核心子目录：
 
-- `includes/`
-  - WordPress 侧逻辑
-- `src/`
-  - Vue 源码
-- `assets/dist/`
-  - 前端构建产物
+- `includes/`：WordPress 侧逻辑
+- `src/`：Vue 源码
+- `assets/dist/`：前端构建产物（npm run build 输出到这里）
+
+#### bili-html-cleaner（工具插件）
+
+目录：`mydev/wp-content/plugins/bili-html-cleaner`
+
+这是一个后台辅助工具，不参与前台展示流程。
+
+它的用途：
+
+- 粘贴 Bilibili 专栏 / Opus 页面的完整 HTML
+- 自动提取正文、清洗噪音
+- 转换成 Markdown
+- 生成适合交给大模型继续整理的 Prompt
+
+入口在后台"工具 → Bilibili HTML Cleaner"。
+
+详细说明见：[docs/bili-html-cleaner.md](bili-html-cleaner.md)
 
 ### 3.2 主题
 
@@ -198,6 +212,19 @@
 - 首页：原生 PHP
 - 单活动页：原生 PHP
 - 其它复杂页面：Shortcode 挂载 Vue 组件
+
+### 3.3 脚本工具（scripts/）
+
+目录：`scripts/`
+
+这是一批 Python 脚本，用于旧数据的批量整理流程，不依赖 WordPress 运行。
+
+当前包含：
+
+- `prepare_elementor_llm_input.py`：从旧 WordPress 导出文件中提取 Elementor 页面 HTML，准备供大模型读取
+- `extract_relay_events_with_llm.py`：调用大模型 API，从 HTML 中抽取结构化活动字段，输出为 JSON
+
+典型使用场景：把旧站 Elementor 数据批量转换成可导入 `relay_event` 的 JSON 文件，再通过后台导入工具入库。
 
 ---
 
@@ -614,6 +641,8 @@ Shortcode：
 
 ## 12. 构建方式
 
+**只有 `tharchive-core` 插件需要构建**。主题（`tharchive-theme`）是纯 PHP + CSS，改完直接打包上传即可，不需要任何构建步骤。
+
 在插件目录执行：
 
 ```bash
@@ -628,6 +657,12 @@ npm run build:submission
 npm run build:archive
 npm run build:carousel
 ```
+
+构建后应至少确认这些文件存在：
+
+- `assets/dist/archive-app.js` / `.css`
+- `assets/dist/submission-app.js` / `.css`
+- `assets/dist/carousel-app.js` / `.css`
 
 ---
 
