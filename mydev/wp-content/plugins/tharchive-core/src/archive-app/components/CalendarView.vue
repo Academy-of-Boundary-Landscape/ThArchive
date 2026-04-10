@@ -1,6 +1,6 @@
 <template>
   <div class="calendar-wrapper">
-    <div v-if="loading" class="state-container">
+    <div v-if="initialLoading" class="state-container">
       <n-spin size="large" stroke="#fff">
         <template #description>
           <span class="muted-text">SYNCING CALENDAR...</span>
@@ -8,27 +8,27 @@
       </n-spin>
     </div>
 
-    <div v-else-if="loadError" class="state-container">
+    <div v-else-if="loadError && !initialized" class="state-container">
       <n-empty :description="loadError">
         <template #extra>
-          <n-button ghost size="small" class="console-btn console-btn--dashed" @click="() => fetchMonthEvents(displayYear, displayMonth)">重新同步</n-button>
+          <n-button ghost size="small" class="console-btn console-btn--dashed" @click="fetchYearEvents(activeYear)">重新同步</n-button>
         </template>
       </n-empty>
     </div>
 
-    <!-- Naive UI Calendar -->
     <div v-else class="scifi-calendar-panel">
       <n-calendar
         v-model:value="currentDate"
         @update:value="handleDateSelect"
+        @panel-change="handlePanelChange"
       >
         <template #default="{ year, month, date }">
            <div class="day-cell">
              <template v-if="getEventsForDate(year, month, date).length > 0">
                <div class="event-indicators">
-                 <div 
-                   v-for="e in getEventsForDate(year, month, date)" 
-                   :key="e.id" 
+                 <div
+                   v-for="e in getEventsForDate(year, month, date)"
+                   :key="e.id"
                    class="event-indicator"
                    :style="getEventIndicatorStyle(e)"
                    :title="e.title?.rendered || ''"
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { NCalendar, NSpin, NModal, NEmpty, NButton } from 'naive-ui';
 import EventCard from './EventCard.vue';
 import { buildDayEventMap, getDayKey } from '../utils/event-utils';
@@ -71,41 +71,29 @@ import { useArchiveApi } from '@archive/composables/useArchiveApi';
 const { buildWpApiUrl, fetchRaw } = useArchiveApi();
 
 const currentDate = ref(Date.now());
-const loading = ref(false);
+const initialLoading = ref(true);
+const initialized = ref(false);
 const loadError = ref('');
 const dayEventMap = ref<Map<string, RelayEvent[]>>(new Map());
+const activeYear = ref(new Date().getFullYear());
 
 const showModal = ref(false);
 const selectedEvents = ref<RelayEvent[]>([]);
 
-const displayYear = computed(() => new Date(currentDate.value).getFullYear());
-const displayMonth = computed(() => new Date(currentDate.value).getMonth() + 1);
-
-function getMonthDateRange(year: number, month: number): { after: string; before: string } {
-  const mm = String(month).padStart(2, '0');
-  const lastDay = new Date(year, month, 0).getDate();
-  return {
-    after: `${year}-${mm}-01`,
-    before: `${year}-${mm}-${String(lastDay).padStart(2, '0')}`,
-  };
-}
-
 let fetchAbortController: AbortController | null = null;
 
-const fetchMonthEvents = async (year: number, month: number) => {
+const fetchYearEvents = async (year: number) => {
   if (fetchAbortController) {
     fetchAbortController.abort();
   }
   const controller = new AbortController();
   fetchAbortController = controller;
 
-  loading.value = true;
   loadError.value = '';
   try {
-    const { after, before } = getMonthDateRange(year, month);
     const url = buildWpApiUrl('wp/v2/relay_event');
-    url.searchParams.append('event_date_after', after);
-    url.searchParams.append('event_date_before', before);
+    url.searchParams.append('event_date_after', `${year}-01-01`);
+    url.searchParams.append('event_date_before', `${year}-12-31`);
     url.searchParams.append('per_page', '999');
     url.searchParams.append('_embed', 'wp:featuredmedia,wp:term');
     url.searchParams.append('_fields', 'id,title,excerpt,link,meta,_links');
@@ -114,6 +102,7 @@ const fetchMonthEvents = async (year: number, month: number) => {
     const data = await response.json();
     const events: RelayEvent[] = Array.isArray(data) ? data : [];
     dayEventMap.value = buildDayEventMap(events);
+    initialized.value = true;
   } catch (err) {
     if ((err as DOMException)?.name === 'AbortError') {
       return;
@@ -122,15 +111,11 @@ const fetchMonthEvents = async (year: number, month: number) => {
     console.error('Failed to fetch events for calendar', err);
   } finally {
     if (fetchAbortController === controller) {
-      loading.value = false;
+      initialLoading.value = false;
       fetchAbortController = null;
     }
   }
 };
-
-watch([displayYear, displayMonth], ([year, month]) => {
-  fetchMonthEvents(year, month);
-}, { immediate: true });
 
 const getEventsForDate = (year: number, month: number, date: number) => {
   const key = getDayKey(year, month, date);
@@ -144,6 +129,23 @@ const handleDateSelect = (_: number, { year, month, date }: { year: number, mont
     showModal.value = true;
   }
 };
+
+const handlePanelChange = (info: { year: number; month: number }) => {
+  if (info.year !== activeYear.value) {
+    activeYear.value = info.year;
+    fetchYearEvents(info.year);
+  }
+};
+
+onMounted(() => {
+  fetchYearEvents(activeYear.value);
+});
+
+onBeforeUnmount(() => {
+  if (fetchAbortController) {
+    fetchAbortController.abort();
+  }
+});
 
 function stripHtml(value?: string): string {
   return (value ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
@@ -175,8 +177,6 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
     '--th-indicator-surface': surface
   };
 }
-
-// Month fetching is handled by the watch on [displayYear, displayMonth] with immediate: true.
 </script>
 
 <style scoped>

@@ -692,12 +692,14 @@ npm run build
 
 ```bash
 cd mydev/wp-content/plugins
+rm ./tharchive-core.zip
 zip -r tharchive-core.zip tharchive-core \
   -x "tharchive-core/node_modules/*" \
   -x "tharchive-core/src/*" \
   -x "tharchive-core/.git/*" \
   -x "tharchive-core/.DS_Store" \
-  -x "tharchive-core/*.log"
+  -x "tharchive-core/*.log" \
+  -x "tharchive-core/*.zip"
 ```
 
 ### 13.3 打包主题
