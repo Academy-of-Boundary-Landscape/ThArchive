@@ -231,7 +231,6 @@ function getStatusClass(name: string): string {
   margin-top: 0.1rem;
   padding-bottom: 1px;
   max-height: 1.1rem;
-  transition: max-height 0.25s ease, margin-top 0.25s ease;
 }
 
 .event-excerpt :deep(p) {

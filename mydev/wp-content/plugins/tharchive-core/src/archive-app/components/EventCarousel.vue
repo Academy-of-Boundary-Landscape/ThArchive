@@ -220,10 +220,9 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0.14) 22%, rgba(255, 255, 255, 0) 48%),
-    radial-gradient(120% 90% at 78% 18%, rgba(130, 168, 255, 0.22), rgba(130, 168, 255, 0) 62%);
+    linear-gradient(120deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.11) 22%, rgba(255, 255, 255, 0) 48%),
+    radial-gradient(120% 90% at 78% 18%, rgba(130, 168, 255, 0.18), rgba(130, 168, 255, 0) 62%);
   opacity: max(0, var(--light-opacity));
-  mix-blend-mode: screen;
   transition: opacity 0.35s ease;
 }
 
@@ -231,18 +230,15 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transform-style: preserve-3d;
 }
 
 .event-carousel__slide-thickness::before {
   content: '';
   position: absolute;
   top: 0;
-  right: -11px;
-  width: 11px;
+  right: -8px;
+  width: 8px;
   height: 100%;
-  transform-origin: left center;
-  transform: rotateY(92deg);
   background: linear-gradient(to right, rgba(244, 248, 255, 0.35), rgba(18, 24, 34, 0.95));
   opacity: max(0.12, var(--edge-opacity));
 }
@@ -251,11 +247,9 @@ const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[
   content: '';
   position: absolute;
   left: 0;
-  bottom: -10px;
+  bottom: -8px;
   width: 100%;
-  height: 10px;
-  transform-origin: center top;
-  transform: rotateX(-88deg);
+  height: 8px;
   background: linear-gradient(to bottom, rgba(220, 231, 255, 0.22), rgba(11, 16, 24, 0.94));
   opacity: max(0.15, var(--edge-opacity));
 }
