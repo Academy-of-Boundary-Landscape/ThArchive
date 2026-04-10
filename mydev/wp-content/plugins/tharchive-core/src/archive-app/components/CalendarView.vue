@@ -11,7 +11,7 @@
     <div v-else-if="loadError" class="state-container">
       <n-empty :description="loadError">
         <template #extra>
-          <n-button ghost size="small" class="console-btn console-btn--dashed" @click="fetchAllEvents">重新同步</n-button>
+          <n-button ghost size="small" class="console-btn console-btn--dashed" @click="() => fetchMonthEvents(displayYear, displayMonth)">重新同步</n-button>
         </template>
       </n-empty>
     </div>
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { NCalendar, NSpin, NModal, NEmpty, NButton } from 'naive-ui';
 import EventCard from './EventCard.vue';
 import { buildDayEventMap, getDayKey } from '../utils/event-utils';
@@ -71,7 +71,6 @@ import { useArchiveApi } from '@archive/composables/useArchiveApi';
 const { buildWpApiUrl, fetchRaw } = useArchiveApi();
 
 const currentDate = ref(Date.now());
-const events = ref<RelayEvent[]>([]);
 const loading = ref(false);
 const loadError = ref('');
 const dayEventMap = ref<Map<string, RelayEvent[]>>(new Map());
@@ -79,42 +78,59 @@ const dayEventMap = ref<Map<string, RelayEvent[]>>(new Map());
 const showModal = ref(false);
 const selectedEvents = ref<RelayEvent[]>([]);
 
-const fetchAllEvents = async () => {
+const displayYear = computed(() => new Date(currentDate.value).getFullYear());
+const displayMonth = computed(() => new Date(currentDate.value).getMonth() + 1);
+
+function getMonthDateRange(year: number, month: number): { after: string; before: string } {
+  const mm = String(month).padStart(2, '0');
+  const lastDay = new Date(year, month, 0).getDate();
+  return {
+    after: `${year}-${mm}-01`,
+    before: `${year}-${mm}-${String(lastDay).padStart(2, '0')}`,
+  };
+}
+
+let fetchAbortController: AbortController | null = null;
+
+const fetchMonthEvents = async (year: number, month: number) => {
+  if (fetchAbortController) {
+    fetchAbortController.abort();
+  }
+  const controller = new AbortController();
+  fetchAbortController = controller;
+
   loading.value = true;
   loadError.value = '';
   try {
-    const aggregatedEvents: RelayEvent[] = [];
-    let page = 1;
-    let totalPages = 1;
+    const { after, before } = getMonthDateRange(year, month);
+    const url = buildWpApiUrl('wp/v2/relay_event');
+    url.searchParams.append('event_date_after', after);
+    url.searchParams.append('event_date_before', before);
+    url.searchParams.append('per_page', '999');
+    url.searchParams.append('_embed', 'wp:featuredmedia,wp:term');
+    url.searchParams.append('_fields', 'id,title,excerpt,link,meta,_links');
 
-    while (page <= totalPages) {
-      const url = buildWpApiUrl('wp/v2/relay_event');
-      url.searchParams.append('_embed', '1');
-      url.searchParams.append('per_page', '100');
-      url.searchParams.append('page', page.toString());
-
-      const response = await fetchRaw(url);
-
-      const totalPagesHeader = response.headers.get('X-WP-TotalPages');
-      totalPages = totalPagesHeader ? parseInt(totalPagesHeader, 10) : 1;
-
-      const data = (await response.json()) as unknown;
-      if (Array.isArray(data)) {
-        aggregatedEvents.push(...(data as RelayEvent[]));
-      }
-
-      page += 1;
-    }
-
-    events.value = aggregatedEvents;
-    dayEventMap.value = buildDayEventMap(aggregatedEvents);
+    const response = await fetchRaw(url, { signal: controller.signal });
+    const data = await response.json();
+    const events: RelayEvent[] = Array.isArray(data) ? data : [];
+    dayEventMap.value = buildDayEventMap(events);
   } catch (err) {
+    if ((err as DOMException)?.name === 'AbortError') {
+      return;
+    }
     loadError.value = '日历归档同步失败，请稍后重试。';
     console.error('Failed to fetch events for calendar', err);
   } finally {
-    loading.value = false;
+    if (fetchAbortController === controller) {
+      loading.value = false;
+      fetchAbortController = null;
+    }
   }
 };
+
+watch([displayYear, displayMonth], ([year, month]) => {
+  fetchMonthEvents(year, month);
+}, { immediate: true });
 
 const getEventsForDate = (year: number, month: number, date: number) => {
   const key = getDayKey(year, month, date);
@@ -160,9 +176,7 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
   };
 }
 
-onMounted(() => {
-  fetchAllEvents();
-});
+// Month fetching is handled by the watch on [displayYear, displayMonth] with immediate: true.
 </script>
 
 <style scoped>

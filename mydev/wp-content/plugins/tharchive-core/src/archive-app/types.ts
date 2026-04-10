@@ -48,7 +48,6 @@ export interface CarouselItem {
 
 export interface ArchiveBootstrap {
   restUrl: string
-  nonce: string
   archiveUrl: string
   mountId: string
 }

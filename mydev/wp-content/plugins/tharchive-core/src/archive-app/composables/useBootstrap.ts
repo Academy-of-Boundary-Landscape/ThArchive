@@ -2,7 +2,6 @@ import type { ArchiveBootstrap } from '@archive/types'
 
 const fallbackBootstrap: ArchiveBootstrap = {
   restUrl: '/wp-json/',
-  nonce: '',
   archiveUrl: '',
   mountId: 'tharchive-relay-index'
 }

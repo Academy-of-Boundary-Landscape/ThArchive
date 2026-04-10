@@ -365,6 +365,18 @@ function tharchive_publish_submission_admin_action() {
 		)
 	);
 
+	// 将 event_status 从"待审核"更新为"准备中"。
+	$current_terms = wp_get_object_terms( $post_id, 'event_status', array( 'fields' => 'slugs' ) );
+	if ( ! is_wp_error( $current_terms ) ) {
+		$pending_slug = sanitize_title( '待审核' );
+		if ( in_array( $pending_slug, $current_terms, true ) ) {
+			$preparing_term_id = tharchive_get_or_create_term_id( '准备中', 'event_status' );
+			if ( $preparing_term_id > 0 ) {
+				wp_set_object_terms( $post_id, array( $preparing_term_id ), 'event_status', false );
+			}
+		}
+	}
+
 	wp_safe_redirect(
 		add_query_arg(
 			array(

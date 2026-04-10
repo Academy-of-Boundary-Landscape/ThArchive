@@ -2,9 +2,9 @@
 /**
  * Plugin Name: THArchive Core
  * Description: 东方Project同人活动归档站核心
- * Version: 1.1.0
+ * Version: 1.1.2
  * Author: renko_1055
- * Last Updated: 2026.3.24
+ * Last Updated: 2026.4.10
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'THARCHIVE_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'THARCHIVE_CORE_URL', plugin_dir_url( __FILE__ ) );
-define( 'THARCHIVE_CORE_VERSION', '1.1.0' );
+define( 'THARCHIVE_CORE_VERSION', '1.1.2' );
 
 require_once THARCHIVE_CORE_PATH . 'includes/helpers.php';
 require_once THARCHIVE_CORE_PATH . 'includes/post-types.php';

@@ -11,10 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function tharchive_get_archive_bootstrap_data() {
 	return array(
-		'restUrl'  => esc_url_raw( rest_url() ),
-		'nonce'    => wp_create_nonce( 'wp_rest' ),
+		'restUrl'    => esc_url_raw( rest_url() ),
 		'archiveUrl' => get_post_type_archive_link( 'relay_event' ),
-		'mountId'  => 'tharchive-relay-index',
+		'mountId'    => 'tharchive-relay-index',
 	);
 }
 
@@ -67,6 +66,11 @@ function tharchive_register_archive_app_collection_params( $params ) {
 			return empty( $value ) || (bool) preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value );
 		},
 	);
+
+	// 提升 per_page 上限，日历视图按月拉取时需要单次返回该月全部活动。
+	if ( isset( $params['per_page']['maximum'] ) ) {
+		$params['per_page']['maximum'] = 999;
+	}
 
 	return $params;
 }
