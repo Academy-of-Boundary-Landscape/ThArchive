@@ -3,6 +3,7 @@ export interface HttpRequestOptions {
   headers?: Record<string, string>
   credentials?: RequestCredentials
   body?: BodyInit | null
+  signal?: AbortSignal | null
 }
 
 export async function requestJson<T>(url: URL | string, options: HttpRequestOptions = {}): Promise<T> {
@@ -10,7 +11,8 @@ export async function requestJson<T>(url: URL | string, options: HttpRequestOpti
     method: options.method ?? 'GET',
     headers: options.headers,
     credentials: options.credentials ?? 'same-origin',
-    body: options.body ?? null
+    body: options.body ?? null,
+    signal: options.signal ?? null
   })
 
   if (!response.ok) {
@@ -25,7 +27,8 @@ export async function requestRaw(url: URL | string, options: HttpRequestOptions 
     method: options.method ?? 'GET',
     headers: options.headers,
     credentials: options.credentials ?? 'same-origin',
-    body: options.body ?? null
+    body: options.body ?? null,
+    signal: options.signal ?? null
   })
 
   if (!response.ok) {

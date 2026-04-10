@@ -50,6 +50,24 @@ function tharchive_register_archive_app_collection_params( $params ) {
 		},
 	);
 
+	$params['event_date_after'] = array(
+		'description'       => '筛选与该日期有重叠的活动：event_date_end >= 该日期，无 end 则回退 event_date（YYYY-MM-DD）。',
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'validate_callback' => static function ( $value ) {
+			return empty( $value ) || (bool) preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value );
+		},
+	);
+
+	$params['event_date_before'] = array(
+		'description'       => '筛选与该日期有重叠的活动：event_date <= 该日期（YYYY-MM-DD）。',
+		'type'              => 'string',
+		'sanitize_callback' => 'sanitize_text_field',
+		'validate_callback' => static function ( $value ) {
+			return empty( $value ) || (bool) preg_match( '/^\d{4}-\d{2}-\d{2}$/', $value );
+		},
+	);
+
 	return $params;
 }
 add_filter( 'rest_relay_event_collection_params', 'tharchive_register_archive_app_collection_params' );
@@ -62,23 +80,73 @@ add_filter( 'rest_relay_event_collection_params', 'tharchive_register_archive_ap
  * @return array
  */
 function tharchive_filter_archive_app_rest_query( $args, $request ) {
+	$meta_query = isset( $args['meta_query'] ) && is_array( $args['meta_query'] )
+		? $args['meta_query']
+		: array();
+
 	$event_year = absint( $request->get_param( 'event_year' ) );
-
 	if ( $event_year > 0 ) {
-		$existing_meta_query = array();
-
-		if ( isset( $args['meta_query'] ) && is_array( $args['meta_query'] ) ) {
-			$existing_meta_query = $args['meta_query'];
-		}
-
-		$existing_meta_query[] = array(
-				'key'     => 'event_year',
-				'value'   => $event_year,
-				'compare' => '=',
-				'type'    => 'NUMERIC',
+		$meta_query[] = array(
+			'key'     => 'event_year',
+			'value'   => $event_year,
+			'compare' => '=',
+			'type'    => 'NUMERIC',
 		);
+	}
 
-		$args['meta_query'] = $existing_meta_query;
+	$date_after  = sanitize_text_field( (string) $request->get_param( 'event_date_after' ) );
+	$date_before = sanitize_text_field( (string) $request->get_param( 'event_date_before' ) );
+
+	// Overlap semantics: eventStart <= filterEnd && eventEnd >= filterStart.
+	// event_date_after = filterStart → event must not end before this date.
+	// event_date_end is an optional admin-only field; most records only have event_date.
+	// When event_date_end is missing or empty, fall back to event_date.
+	if ( $date_after && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_after ) ) {
+		$meta_query[] = array(
+			'relation' => 'OR',
+			array(
+				'key'     => 'event_date_end',
+				'value'   => $date_after,
+				'compare' => '>=',
+				'type'    => 'DATE',
+			),
+			array(
+				'relation' => 'AND',
+				// event_date_end absent or saved as empty string by admin.
+				array(
+					'relation' => 'OR',
+					array(
+						'key'     => 'event_date_end',
+						'compare' => 'NOT EXISTS',
+					),
+					array(
+						'key'     => 'event_date_end',
+						'value'   => '',
+						'compare' => '=',
+					),
+				),
+				array(
+					'key'     => 'event_date',
+					'value'   => $date_after,
+					'compare' => '>=',
+					'type'    => 'DATE',
+				),
+			),
+		);
+	}
+
+	// event_date_before = filterEnd → event must not start after this date.
+	if ( $date_before && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date_before ) ) {
+		$meta_query[] = array(
+			'key'     => 'event_date',
+			'value'   => $date_before,
+			'compare' => '<=',
+			'type'    => 'DATE',
+		);
+	}
+
+	if ( ! empty( $meta_query ) ) {
+		$args['meta_query'] = $meta_query;
 	}
 
 	return $args;

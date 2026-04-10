@@ -16,9 +16,10 @@ export function useArchiveApi() {
     })
   }
 
-  async function fetchRaw(url: URL): Promise<Response> {
+  async function fetchRaw(url: URL, extra?: { signal?: AbortSignal | null }): Promise<Response> {
     return requestRaw(url, {
-      headers
+      headers,
+      signal: extra?.signal
     })
   }
 

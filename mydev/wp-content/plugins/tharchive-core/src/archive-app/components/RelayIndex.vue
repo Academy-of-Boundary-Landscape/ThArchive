@@ -24,6 +24,7 @@
                   v-model:value="filters.event_status"
                   :options="statusOptions"
                   placeholder="全部状态"
+                  clearable
                   class="filter-select"
                   @update:value="applyFilters"
                 />
@@ -35,6 +36,7 @@
                   v-model:value="filters.event_type"
                   :options="typeOptions"
                   placeholder="全部分类"
+                  clearable
                   class="filter-select"
                   @update:value="applyFilters"
                 />
@@ -46,6 +48,7 @@
                   v-model:value="filters.year"
                   :options="yearOptions"
                   placeholder="全部年份"
+                  clearable
                   class="filter-select"
                   @update:value="applyFilters"
                 />
@@ -60,6 +63,7 @@
                   class="filter-search"
                   clearable
                   @keyup.enter="applyFilters"
+                  @clear="applyFilters"
                 />
               </div>
 
@@ -95,12 +99,12 @@
           <div v-else-if="loadError" class="state-container">
             <n-empty :description="loadError">
               <template #extra>
-                <n-button ghost size="small" class="console-btn console-btn--dashed" @click="fetchEvents">重新加载</n-button>
+                <n-button ghost size="small" class="console-btn console-btn--dashed" @click="() => fetchEvents()">重新加载</n-button>
               </template>
             </n-empty>
           </div>
           
-          <div v-else-if="displayEvents.length === 0" class="state-container">
+          <div v-else-if="events.length === 0" class="state-container">
             <n-empty description="未找到匹配的归档记录">
               <template #extra>
                 <n-button ghost size="small" class="console-btn console-btn--dashed" @click="resetFilters">重置终端</n-button>
@@ -108,19 +112,21 @@
             </n-empty>
           </div>
 
-          <div v-else class="relay-card-grid">
-            <EventCard v-for="event in displayEvents" :key="event.id" :event="event" />
-          </div>
+          <template v-else>
+            <div class="relay-card-grid">
+              <EventCard v-for="event in events" :key="event.id" :event="event" />
+            </div>
 
-          <!-- 极简分页 -->
-          <div v-if="totalPages > 1" class="pagination-wrapper">
-            <n-pagination
-              v-model:page="currentPage"
-              :page-count="totalPages"
-              show-quick-jumper
-              @update:page="changePage"
-            />
-          </div>
+            <!-- 极简分页 -->
+            <div v-if="totalPages > 1" class="pagination-wrapper">
+              <n-pagination
+                :page="currentPage"
+                :page-count="totalPages"
+                show-quick-jumper
+                @update:page="changePage"
+              />
+            </div>
+          </template>
         </div>
         
         <div v-else-if="currentView === 'calendar'">
@@ -172,11 +178,13 @@ function getInitialViewFromUrl(): ArchiveView {
   return 'list';
 }
 
-const allEvents = ref<RelayEvent[]>([]);
+const events = ref<RelayEvent[]>([]);
 const loading = ref(false);
 const currentPage = ref(1);
+const totalPages = ref(1);
 const loadError = ref('');
 const pageSize = 12;
+let fetchAbortController: AbortController | null = null;
 
 function createDefaultYears(span = 8): number[] {
   const currentYear = new Date().getFullYear();
@@ -198,63 +206,13 @@ const taxData = reactive<ArchiveTaxData>({
 });
 
 const statusOptions = computed(() => {
-  return [{ label: '全部状态', value: '' }, ...taxData.event_status.map((t: EventTerm) => ({ label: t.name, value: t.id }))];
+  return taxData.event_status.map((t: EventTerm) => ({ label: t.name, value: t.id }));
 });
 const typeOptions = computed(() => {
-  return [{ label: '全部分类', value: '' }, ...taxData.event_type.map((t: EventTerm) => ({ label: t.name, value: t.id }))];
+  return taxData.event_type.map((t: EventTerm) => ({ label: t.name, value: t.id }));
 });
 const yearOptions = computed(() => {
-  return [{ label: '全部年份', value: '' }, ...availableYears.value.map(y => ({ label: `${y}年`, value: y }))];
-});
-
-function normalizeDateLike(value: string): string {
-  return value.replace(/\//g, '-').trim();
-}
-
-function parseEventDate(value?: string): Date | null {
-  if (!value) {
-    return null;
-  }
-
-  const normalized = normalizeDateLike(value);
-  const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) {
-    return null;
-  }
-
-  const parsed = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-const filteredEvents = computed(() => {
-  const range = filters.date_range;
-  if (!range?.[0] || !range?.[1]) {
-    return allEvents.value;
-  }
-
-  const filterStart = parseEventDate(range[0]);
-  const filterEnd = parseEventDate(range[1]);
-
-  if (!filterStart || !filterEnd) {
-    return allEvents.value;
-  }
-
-  return allEvents.value.filter((event) => {
-    const eventStart = parseEventDate(event.meta?.event_date);
-    if (!eventStart) {
-      return false;
-    }
-
-    const eventEnd = parseEventDate(event.meta?.event_date_end) ?? eventStart;
-    return eventStart <= filterEnd && eventEnd >= filterStart;
-  });
-});
-
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredEvents.value.length / pageSize)));
-
-const displayEvents = computed(() => {
-  const startIndex = (currentPage.value - 1) * pageSize;
-  return filteredEvents.value.slice(startIndex, startIndex + pageSize);
+  return availableYears.value.map(y => ({ label: `${y}年`, value: y }));
 });
 
 const fetchTaxonomies = async () => {
@@ -263,55 +221,65 @@ const fetchTaxonomies = async () => {
     statusUrl.searchParams.set('per_page', '100');
     statusUrl.searchParams.set('orderby', 'name');
     statusUrl.searchParams.set('order', 'asc');
-    taxData.event_status = await fetchJson<EventTerm[]>(statusUrl);
 
     const typeUrl = buildWpApiUrl('wp/v2/event_type');
     typeUrl.searchParams.set('per_page', '100');
     typeUrl.searchParams.set('orderby', 'name');
     typeUrl.searchParams.set('order', 'asc');
-    taxData.event_type = await fetchJson<EventTerm[]>(typeUrl);
+
+    const [statusData, typeData] = await Promise.all([
+      fetchJson<EventTerm[]>(statusUrl),
+      fetchJson<EventTerm[]>(typeUrl),
+    ]);
+    taxData.event_status = statusData;
+    taxData.event_type = typeData;
   } catch (error) {
     console.error('Failed to load taxonomies:', error);
   }
 };
 
-const fetchEvents = async () => {
+const fetchEvents = async (page = currentPage.value) => {
+  if (fetchAbortController) {
+    fetchAbortController.abort();
+  }
+  const controller = new AbortController();
+  fetchAbortController = controller;
+
+  // Snapshot reactive filters to prevent mid-request mutation.
+  const snap = {
+    search: filters.search.trim(),
+    event_status: filters.event_status,
+    event_type: filters.event_type,
+    year: filters.year,
+    date_range: filters.date_range ? [...filters.date_range] as [string, string] : null,
+  };
+
   loading.value = true;
   loadError.value = '';
-  allEvents.value = [];
   try {
-    const aggregatedEvents: RelayEvent[] = [];
-    let page = 1;
-    let totalRemotePages = 1;
+    const url = buildWpApiUrl('wp/v2/relay_event');
+    url.searchParams.append('_embed', 'wp:featuredmedia,wp:term');
+    url.searchParams.append('_fields', 'id,title,excerpt,link,meta,_links');
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('per_page', pageSize.toString());
 
-    while (page <= totalRemotePages) {
-      const url = buildWpApiUrl('wp/v2/relay_event');
-      url.searchParams.append('_embed', '1');
-      url.searchParams.append('page', page.toString());
-      url.searchParams.append('per_page', '100');
+    if (snap.search) url.searchParams.append('search', snap.search);
+    if (snap.event_status) url.searchParams.append('event_status', snap.event_status.toString());
+    if (snap.event_type) url.searchParams.append('event_type', snap.event_type.toString());
+    if (snap.year) url.searchParams.append('event_year', snap.year.toString());
+    if (snap.date_range?.[0]) url.searchParams.append('event_date_after', snap.date_range[0]);
+    if (snap.date_range?.[1]) url.searchParams.append('event_date_before', snap.date_range[1]);
 
-      if (filters.search.trim()) url.searchParams.append('search', filters.search.trim());
-      if (filters.event_status) url.searchParams.append('event_status', filters.event_status.toString());
-      if (filters.event_type) url.searchParams.append('event_type', filters.event_type.toString());
-      if (filters.year) {
-        url.searchParams.append('event_year', filters.year.toString());
-      }
+    const response = await fetchRaw(url, { signal: controller.signal });
 
-      const response = await fetchRaw(url);
-      const totalPagesHeader = response.headers.get('X-WP-TotalPages');
-      totalRemotePages = totalPagesHeader ? parseInt(totalPagesHeader, 10) : 1;
+    const remoteTotalPages = parseInt(response.headers.get('X-WP-TotalPages') ?? '1', 10);
+    totalPages.value = Math.max(1, remoteTotalPages);
 
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        aggregatedEvents.push(...data);
-      }
+    const data = await response.json();
+    events.value = Array.isArray(data) ? data : [];
 
-      page += 1;
-    }
-
-    allEvents.value = aggregatedEvents;
-
-    const discoveredYears = aggregatedEvents
+    // Discover years for the year dropdown from the current page.
+    const discoveredYears = events.value
       .map((item: RelayEvent) => Number(item.meta?.event_year))
       .filter((year): year is number => Number.isInteger(year) && year > 0);
 
@@ -320,26 +288,34 @@ const fetchEvents = async () => {
       availableYears.value = Array.from(mergedYears).sort((a, b) => b - a);
     }
   } catch (error) {
+    if ((error as DOMException)?.name === 'AbortError') {
+      return;
+    }
     loadError.value = '归档数据加载失败，请稍后重试。';
     console.error("Fetch error:", error);
   } finally {
-    loading.value = false;
+    if (fetchAbortController === controller) {
+      loading.value = false;
+      fetchAbortController = null;
+    }
   }
 };
 
 const changePage = (page: number) => {
   currentPage.value = page;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  fetchEvents(page);
 };
 
 const applyFilters = () => {
   currentPage.value = 1;
-  fetchEvents();
+  fetchEvents(1);
 };
 
 const onDateRangeChange = (value: [string, string] | null) => {
   filters.date_range = value;
-  applyFilters();
+  currentPage.value = 1;
+  fetchEvents(1);
 };
 
 const resetFilters = () => {
@@ -349,7 +325,7 @@ const resetFilters = () => {
   filters.date_range = null;
   filters.search = '';
   currentPage.value = 1;
-  fetchEvents();
+  fetchEvents(1);
 };
 
 onMounted(() => {
