@@ -21,7 +21,7 @@ get_header();
 	<section class="front-hero">
 		<div class="container front-hero__inner">
 			<div class="front-hero__content">
-				<p class="front-hero__eyebrow">THArchive - Version 1.0 "Astrolabe"</p>
+				<p class="front-hero__eyebrow">THArchive - Version 1.1 "Astrolabe"</p>
 				<h1 class="front-hero__title">东方同人接力归档站</h1>
 				<p class="front-hero__desc">
 					一个用于整理、展示与归档东方Project 同人接力活动的网站。

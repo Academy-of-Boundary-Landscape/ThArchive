@@ -58,7 +58,7 @@ $site_title     = '东方同人接力归档';
 
 			<div class="tharchive-header-status" aria-hidden="true">
 				<span class="tharchive-header-status__dot"></span>
-				<span class="tharchive-header-status__text"><?php esc_html_e( 'V1.0: ASTROLABE', 'tharchive-theme' ); ?></span>
+				<span class="tharchive-header-status__text"><?php esc_html_e( 'V1.1: ASTROLABE', 'tharchive-theme' ); ?></span>
 			</div>
 		</header>
 	</div>
