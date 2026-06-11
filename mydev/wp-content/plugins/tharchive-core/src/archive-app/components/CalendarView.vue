@@ -216,7 +216,7 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
 }
 .event-indicator {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
   font-size: 0.72rem;
   color: #e2e8f0;
@@ -230,16 +230,24 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
   cursor: pointer;
 }
 .event-dot {
+  flex: 0 0 auto;
   width: 5px; height: 5px;
+  margin-top: 4px;
   background: var(--th-indicator-accent, rgba(188, 226, 255, 0.95));
   border-radius: 50%;
   box-shadow: 0 0 8px var(--th-indicator-glow, rgba(140, 230, 255, 0.32));
 }
 .event-title-trunc {
-  white-space: nowrap;
+  /* 最多两行，超出再省略：标题可显示约两倍字数，短标题仍占一行，配合日历自适应高度不会溢出 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
+  line-height: 1.3;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .empty-text {
