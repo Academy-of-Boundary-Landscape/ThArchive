@@ -92,7 +92,7 @@
 
 .front-hero__carousel {
   margin-top: 64px;
-  width: min(1100px, calc(100vw - 40px));
+  width: min(1100px, calc(100% - 40px));
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -149,7 +149,7 @@
 
   .front-hero__carousel {
     margin-top: 44px;
-    width: min(1100px, calc(100vw - 20px));
+    width: min(1100px, calc(100% - 20px));
     left: 50%;
     transform: translateX(-50%);
     padding: 16px 0 0;
