@@ -70,8 +70,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { toRef } from 'vue'
 import type { CarouselItem } from '@carousel/types'
+import { useCarousel } from '@shared/useCarousel'
 
 const props = withDefaults(
   defineProps<{
@@ -83,7 +84,7 @@ const props = withDefaults(
   }
 )
 
-const activeIndex = ref(0)
+const { activeIndex, getOffset, slideClass, slideStyle, goPrev, goNext, activeItem } = useCarousel(toRef(props, 'items'))
 
 function getSlideAriaLabel(item: CarouselItem, index: number): string {
   if (index === activeIndex.value && item.href) {
@@ -91,47 +92,6 @@ function getSlideAriaLabel(item: CarouselItem, index: number): string {
   }
 
   return `切换到 ${item.title}`
-}
-
-function getOffset(index: number): number {
-  const total = props.items.length
-  let diff = index - activeIndex.value
-  if (total > 1) {
-    if (diff > total / 2) {
-      diff -= total
-    }
-    if (diff < -total / 2) {
-      diff += total
-    }
-  }
-  return diff
-}
-
-function slideClass(index: number): Record<string, boolean> {
-  const offset = getOffset(index)
-  return {
-    'is-active': offset === 0,
-    'is-side': Math.abs(offset) > 0 && Math.abs(offset) <= 2,
-    'is-hidden': Math.abs(offset) > 2
-  }
-}
-
-function slideStyle(index: number): Record<string, string> {
-  const offset = getOffset(index)
-  return {
-    '--offset': String(offset),
-    '--abs-offset': String(Math.abs(offset))
-  }
-}
-
-function goPrev(): void {
-  const total = props.items.length
-  activeIndex.value = (activeIndex.value - 1 + total) % total
-}
-
-function goNext(): void {
-  const total = props.items.length
-  activeIndex.value = (activeIndex.value + 1) % total
 }
 
 function onSlideClick(item: CarouselItem, index: number): void {
@@ -142,15 +102,6 @@ function onSlideClick(item: CarouselItem, index: number): void {
 
   activeIndex.value = index
 }
-
-watch(
-  () => props.items.length,
-  () => {
-    activeIndex.value = 0
-  }
-)
-
-const activeItem = computed(() => props.items[activeIndex.value] ?? props.items[0])
 </script>
 
 <style scoped>
