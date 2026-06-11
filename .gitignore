@@ -41,3 +41,4 @@ scripts/output/
 
 # Ignore package artifacts.
 *.zip
+.gstack/
