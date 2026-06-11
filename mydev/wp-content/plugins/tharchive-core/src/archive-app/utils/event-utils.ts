@@ -112,3 +112,7 @@ export function buildDayEventMap(events: RelayEvent[]): Map<string, RelayEvent[]
 
   return map;
 }
+
+export function stripHtmlToText(value?: string): string {
+  return (value ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+}

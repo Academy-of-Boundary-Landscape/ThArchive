@@ -34,7 +34,7 @@
                    :title="e.title?.rendered || ''"
                  >
                    <span class="event-dot"></span>
-                   <span class="event-title-trunc">{{ stripHtml(e.title?.rendered) }}</span>
+                   <span class="event-title-trunc">{{ stripHtmlToText(e.title?.rendered) }}</span>
                  </div>
                </div>
              </template>
@@ -64,7 +64,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { NCalendar, NSpin, NModal, NEmpty, NButton } from 'naive-ui';
 import EventCard from './EventCard.vue';
-import { buildDayEventMap, getDayKey } from '../utils/event-utils';
+import { buildDayEventMap, getDayKey, stripHtmlToText } from '../utils/event-utils';
 import type { RelayEvent } from '@archive/types';
 import { useArchiveApi } from '@archive/composables/useArchiveApi';
 
@@ -147,10 +147,6 @@ onBeforeUnmount(() => {
   }
 });
 
-function stripHtml(value?: string): string {
-  return (value ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-}
-
 function hashString(value: string): number {
   let hash = 0;
 
@@ -162,7 +158,7 @@ function hashString(value: string): number {
 }
 
 function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
-  const title = stripHtml(event.title?.rendered) || `event-${event.id}`;
+  const title = stripHtmlToText(event.title?.rendered) || `event-${event.id}`;
   const hash = hashString(title);
   const hue = hash % 360;
   const accent = `hsla(${hue}, 78%, 72%, 0.92)`;

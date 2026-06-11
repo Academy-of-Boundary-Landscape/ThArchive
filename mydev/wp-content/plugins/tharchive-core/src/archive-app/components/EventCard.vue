@@ -22,7 +22,7 @@
 
       <div class="cyber-card-content">
         <h4 class="event-title">
-          <a :href="event.link">{{ stripHtml(event.title?.rendered) || '未命名活动' }}</a>
+          <a :href="event.link">{{ stripHtmlToText(event.title?.rendered) || '未命名活动' }}</a>
         </h4>
 
         <div class="event-meta-row">
@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <div class="event-excerpt">{{ stripHtml(event.excerpt?.rendered) }}</div>
+        <div class="event-excerpt">{{ stripHtmlToText(event.excerpt?.rendered) }}</div>
       </div>
     </div>
   </n-card>
@@ -41,16 +41,12 @@
 
 <script setup lang="ts">
 import { NCard, NTag } from 'naive-ui';
-import { getTerms, getThumbnailUrl, hasTerms, hasThumbnail } from '../utils/event-utils';
+import { getTerms, getThumbnailUrl, hasTerms, hasThumbnail, stripHtmlToText } from '../utils/event-utils';
 import type { RelayEvent } from '@archive/types';
 
 defineProps<{
   event: RelayEvent;
 }>();
-
-function stripHtml(value?: string): string {
-  return (value ?? '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
-}
 
 function getStatusClass(name: string): string {
   const normalized = name.trim();
