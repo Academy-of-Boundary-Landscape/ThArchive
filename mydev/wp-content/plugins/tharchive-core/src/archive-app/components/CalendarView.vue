@@ -211,17 +211,17 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
 .event-indicators {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 5px;
+  margin-top: 6px;
 }
 .event-indicator {
   display: flex;
   align-items: flex-start;
-  gap: 6px;
-  font-size: 0.72rem;
+  gap: 5px;
+  font-size: 0.7rem;
   color: #e2e8f0;
   background: var(--th-indicator-surface, linear-gradient(90deg, rgba(16, 26, 40, 0.68) 0%, rgba(12, 18, 28, 0.26) 100%));
-  padding: 4px 6px;
+  padding: 3px 5px;
   border-radius: 0;
   border-left: 2px solid var(--th-indicator-accent, rgba(188, 226, 255, 0.82));
   box-shadow:
