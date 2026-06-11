@@ -37,14 +37,7 @@ export interface ArchiveTaxData {
   event_type: EventTerm[]
 }
 
-export interface CarouselItem {
-  id: number
-  title: string
-  description?: string
-  imageUrl?: string
-  href?: string
-  meta?: string
-}
+export type { CarouselItem } from '@shared/types'
 
 export interface ArchiveBootstrap {
   restUrl: string

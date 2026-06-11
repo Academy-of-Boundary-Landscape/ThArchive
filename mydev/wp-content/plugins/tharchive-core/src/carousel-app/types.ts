@@ -11,14 +11,7 @@ export interface CarouselMountConfig {
   emptyText?: string
 }
 
-export interface CarouselItem {
-  id: number
-  title: string
-  description?: string
-  imageUrl?: string
-  href?: string
-  meta?: string
-}
+export type { CarouselItem } from '@shared/types'
 
 export interface RelayEventLite {
   id: number
