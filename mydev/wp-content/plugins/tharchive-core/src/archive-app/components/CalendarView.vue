@@ -325,6 +325,18 @@ function getEventIndicatorStyle(event: RelayEvent): Record<string, string> {
   --n-text-color-disabled: #475569;
 }
 
+/* 让日历高度随内容自适应：覆盖 naive-ui 固定的 height:720px 和等分行高（grid-auto-rows:1fr）。
+   naive 给列做了 minmax(0,1fr) 兜底、却给行用裸 1fr（最小为内容高度），导致某天活动过多时
+   该行被撑高、冲出固定外框造成溢出。这里改为：日历整体 height:auto、行改用 minmax(110px,auto)，
+   稀疏月份保持接近原来的行高，活动密集时该行随内容自然增长、页面滚动，不再溢出。 */
+.scifi-calendar-panel :deep(.n-calendar) {
+  height: auto;
+}
+
+.scifi-calendar-panel :deep(.n-calendar-dates) {
+  grid-auto-rows: minmax(110px, auto);
+}
+
 .scifi-calendar-panel :deep(.n-calendar-header) {
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(156, 192, 236, 0.12);
