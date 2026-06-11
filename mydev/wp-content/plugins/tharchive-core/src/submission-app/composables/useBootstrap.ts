@@ -12,7 +12,8 @@ const fallbackBootstrap: SubmissionBootstrap = {
   },
   upload: {
     acceptedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-    maxGalleryFiles: 20
+    maxGalleryFiles: 20,
+    maxFileSizeBytes: 8 * 1024 * 1024
   },
   labels: {
     submitButton: '提交活动信息',

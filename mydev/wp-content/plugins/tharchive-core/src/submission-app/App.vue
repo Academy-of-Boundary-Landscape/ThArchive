@@ -48,6 +48,7 @@
           :clear-error="clearError"
           :accepted-image-types="bootstrap.upload.acceptedImageTypes"
           :max-gallery-files="bootstrap.upload.maxGalleryFiles"
+          :max-file-size-bytes="bootstrap.upload.maxFileSizeBytes"
           @update:cover-file="form.coverFile = $event"
           @update:gallery-files="form.galleryFiles = $event"
         />

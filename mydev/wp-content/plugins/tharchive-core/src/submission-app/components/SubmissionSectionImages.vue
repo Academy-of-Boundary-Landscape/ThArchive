@@ -76,6 +76,9 @@
             <n-text v-if="isGalleryAtLimit" depth="3" class="submission-gallery-limit-note">
               已达到图集上限（{{ maxGalleryFiles }} 张），如需继续添加请先移除部分图片。
             </n-text>
+            <n-text v-if="galleryError" depth="3" class="submission-gallery-limit-note">
+              {{ galleryError }}
+            </n-text>
 
             <div v-if="galleryPreviewItems.length > 0" class="submission-gallery-scroll-wrap">
               <div class="submission-gallery-scroll-track">
@@ -114,6 +117,7 @@ const props = defineProps<{
   clearError: (field: string) => void
   acceptedImageTypes: string[]
   maxGalleryFiles: number
+  maxFileSizeBytes: number
 }>()
 
 const emit = defineEmits<{
@@ -128,6 +132,7 @@ const coverInputRef = ref<HTMLInputElement | null>(null)
 const galleryInputRef = ref<HTMLInputElement | null>(null)
 const coverPreviewUrl = ref<string | null>(null)
 const galleryPreviewItems = ref<Array<{ key: string; name: string; url: string }>>([])
+const galleryError = ref('')
 
 function formatAcceptedTypeHint(types: string[]): string {
   if (!types.length) {
@@ -153,6 +158,14 @@ function formatAcceptedTypeHint(types: string[]): string {
   })
 
   return `支持 ${pretty.join(' / ')}`
+}
+
+function isFileSizeValid(file: File): boolean {
+  return file.size <= props.maxFileSizeBytes
+}
+
+function formatMaxSize(): string {
+  return `${Math.round(props.maxFileSizeBytes / (1024 * 1024))}MB`
 }
 
 function fileKey(file: File): string {
@@ -218,6 +231,11 @@ function removeGalleryFile(index: number) {
 function onCoverChange(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0] ?? null
+  if (file && !isFileSizeValid(file)) {
+    props.errors.coverFile = `封面图超过 ${formatMaxSize()} 上限，请压缩后再上传。`
+    input.value = ''
+    return
+  }
   emit('update:coverFile', file)
   props.clearError('coverFile')
   revokeCoverPreview()
@@ -229,7 +247,12 @@ function onCoverChange(event: Event) {
 function onGalleryChange(event: Event) {
   const input = event.target as HTMLInputElement
   const incomingFiles = Array.from(input.files ?? [])
-  const mergedFiles = mergeGalleryFiles(props.form.galleryFiles, incomingFiles, props.maxGalleryFiles)
+  const oversized = incomingFiles.filter((file) => !isFileSizeValid(file))
+  const validFiles = incomingFiles.filter(isFileSizeValid)
+  galleryError.value = oversized.length
+    ? `有 ${oversized.length} 张图片超过 ${formatMaxSize()} 上限，已跳过。`
+    : ''
+  const mergedFiles = mergeGalleryFiles(props.form.galleryFiles, validFiles, props.maxGalleryFiles)
 
   emit('update:galleryFiles', mergedFiles)
   syncGalleryInputFiles(mergedFiles)

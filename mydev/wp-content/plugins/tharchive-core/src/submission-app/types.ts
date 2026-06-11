@@ -26,6 +26,7 @@ export interface SubmissionBootstrap {
   upload: {
     acceptedImageTypes: string[]
     maxGalleryFiles: number
+    maxFileSizeBytes: number
   }
   labels: {
     submitButton: string
