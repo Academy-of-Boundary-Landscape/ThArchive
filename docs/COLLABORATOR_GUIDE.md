@@ -708,6 +708,7 @@ zip -r tharchive-core.zip tharchive-core \
 
 ```bash
 cd mydev/wp-content/themes
+rm ./tharchive-theme.zip
 zip -r tharchive-theme.zip tharchive-theme \
   -x "tharchive-theme/.git/*" \
   -x "tharchive-theme/.DS_Store" \
